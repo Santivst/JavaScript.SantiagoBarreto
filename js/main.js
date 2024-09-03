@@ -5,7 +5,9 @@
 let peso = 0;
 let altura = 0;
 
+// Función para solicitar y validar el ingreso de peso y altura
 function calculadoraIMC () {
+    // Solicita el peso del usuario y valida que sea un número positivo
     let peso = parseFloat(prompt("Ingrese su peso en kilogramos (ej: 70kg)"));
 
     while (peso <=0 || isNaN(peso)) {
@@ -13,15 +15,18 @@ function calculadoraIMC () {
         peso = parseFloat(prompt("Ingrese su peso en kilogramos (ej: 70kg)"));
     }
     
+    // Solicita la altura del usuario y valida que sea un número positivo
     let altura = parseFloat(prompt("Ingrese su altura en metros (ej:1.70m)"));
     
     while (altura <=0 || isNaN(altura)) {
         alert("Por favor, ingrese un valor válido para la altura");
         altura = parseFloat(prompt("Ingrese su altura en metros (ej:1.70m)"));
     }
+    // Calcula el IMC basado en el peso y la altura
     imc = (a, b) => a / (b * b) 
     const resultadoIMC = imc (peso, altura) 
     
+    // Muestra el IMC calculado al usuario y una categoría basada en el valor del IMC
     alert("Su índice de masa corporal es equivalente a " + resultadoIMC.toFixed(2));
     
     if (resultadoIMC <= 16.00) {
@@ -45,7 +50,7 @@ function calculadoraIMC () {
     alert("Muchas gracias por usar la calculadora de IMC, que tengas buen día.")
 }
 
-
+// Función para permitir al usuario repetir la calculadora
 function repetirCalculadora () {
     let otra = prompt("Le gustaría volver a usar la calculadora? Escriba 'Si' o 'No'");
     while (otra != "No") {
@@ -58,18 +63,20 @@ function repetirCalculadora () {
             default: alert ("Por favor, escriba 'Si' o 'No' para volver a usar la calculadora o finalizar el proceso");
             break;
         }
-        otra = prompt("Le gustaría volver a usar la calculadora? Escriba 'Si' o 'No'");
+        otra = prompt("¿Le gustaría volver a usar la calculadora? Escriba 'Si' o 'No'");
     }
 }
 
 
 // -------- //
 
+
+// Inicio del programa
 alert("Bienvenido a la calculadora de Índice de Masa Corporal (IMC), por favor, ingrese sus datos:");
 
 calculadoraIMC ();
 repetirCalculadora();
-
+// -------- //
 
 
 //! ////////////////////
