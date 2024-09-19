@@ -1,82 +1,234 @@
+//! SEGUNDA PREENTREGA, UNA VERDULERÍA
+
+/*
+* OBJETOS
+*/
+
+//* Lista original
+const productos = [
+    {verdura: "Papa", precio: 15, stock: 60},
+    {verdura: "Zanahoria", precio: 40, stock: 20},
+    {verdura: "Lechuga", precio: 30, stock: 40},
+    {verdura: "Morron", precio: 70, stock: 15},
+]
+
+
+/*
+* FUNCIONES
+*/
+
+function comprar(verdura, cantidad) {
+    // Buscar el producto en el array de productos
+    const productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === verdura.toLowerCase());
+    // Verificar si el producto existe
+    if (productoEncontrado) {
+        // Verificar si hay suficiente stock
+        if (productoEncontrado.stock >= cantidad) {
+            productoEncontrado.stock -= cantidad;  // Restar la cantidad comprada del stock
+            return `Compra exitosa. Stock restante de ${productoEncontrado.verdura}: ${productoEncontrado.stock}`;
+        } else {
+            return `No hay suficiente stock de ${productoEncontrado.verdura}. Stock actual: ${productoEncontrado.stock}`;
+        }
+    } else {
+        return "El producto seleccionado no está en nuestro catálogo.";
+    }
+}
+
+
+// Constructor para añadir productos
+class Producto {
+    constructor (verdura, precio, stock) {
+        this.verdura = verdura;
+        this.precio = parseFloat(parseFloat(precio).toFixed(2));
+        this.stock = parseInt(stock); 
+    }
+    
+    añadirALaLista = () => {productos.push(this);}
+}
+
+
+// Función para que el usuario agrege un producto por cuenta propia
+function añadirProdctoPorPrompt () {
+    const nombre = prompt("Ingrese el nombre del producto que va a añadir");
+    const precio = prompt("Ingrese el precio del producto que va a añadir");
+    const stock = prompt("Ingrese el stock del producto que va a añadir");
+
+    // Crear una nueva instancia de Producto con los valores ingresados
+    const nuevoProducto = new Producto(nombre, precio, stock);
+
+    // Añadir el nuevo producto a la lista
+    nuevoProducto.añadirALaLista();
+}
+
+
+// Función para sumarle stock a los productos que se encuentran en la lista
+function añadirProductosAlStock () {
+    let nombreDeProductoAAñadir = prompt ("Ingrese el nombre del producto al que desea añadirle unidaders existentes");
+    let productoASumar = productos.find(producto => producto.verdura.toLowerCase() === nombreDeProductoAAñadir.toLowerCase());
+
+    // Mientras no se encuentre el producto, solicitar nuevamente el input
+    while (!productoASumar) {
+        alert("Este producto no se encuentra disponible. Intente de nuevo.");
+        nombreDeProductoAAñadir = prompt("Ingrese el nombre del producto al que desea añadirle unidades existentes");
+        productoASumar = productos.find(producto => producto.verdura.toLowerCase() === nombreDeProductoAAñadir.toLowerCase());
+    }
+
+    let cantidadDeProductosAAñadir = parseInt(prompt("Ingrese la cantidad de unidades que desea añadir al stock actual"));
+    if (!isNaN(cantidadDeProductosAAñadir)) {
+        productoASumar.stock += cantidadDeProductosAAñadir;
+        alert(`Se añadieron ${cantidadDeProductosAAñadir} unidades al stock de ${productoASumar.verdura}. Stock actual: ${productoASumar.stock}`);
+    } else {
+        while (isNaN(cantidadDeProductosAAñadir) || cantidadDeProductosAAñadir < 0) {
+            alert("Cantidad inválida.");
+            cantidadDeProductosAAñadir = parseInt(prompt("Ingrese la cantidad de unidades que desea añadir al stock actual"));
+        }
+    }
+}
+
+
+
+/*
+* INICIO DEL PROGRAMA
+*/
+
+alert("Bienvenido a la verdulería Las Divinas. Por favor, seleccione una de las siguientes acciones:");
+let accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+
+while (accion != 0) {
+    switch (accion) {
+        case 1:
+            alert("Nuestro catálogo incluye los siguientes productos actualmente:");
+            productos.forEach(element => {
+                alert(element.verdura + ", a $" + element.precio + ". Existencias actuales: " + element.stock + " unidades.");
+            });
+            console.log(productos);
+            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+            break;
+        case 2: 
+            let productoAComprar = prompt("Ingrese el producto que desea comprar.");
+
+            // Buscar el producto en el catálogo
+            let productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === productoAComprar.toLowerCase());
+            
+            // Verificar si el producto está en la lista
+            while (!productoEncontrado) {
+                productoAComprar = prompt("El producto ingresado no corresponde a ninguno en la lista. Ingrese un producto válido para continuar.");
+                productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === productoAComprar.toLowerCase());
+            }
+            
+            let cantidadAComprar = parseInt(prompt("Ingrese la cantidad que desea comprar del producto. Si desea volver al menú anterior, ingrese 0."));
+            while (cantidadAComprar < 0 || isNaN(cantidadAComprar)) {
+                alert("El valor ingresado no es válido para efectuar la compra. Porfavor, ingrese un valor válido");
+                cantidadAComprar = parseInt(prompt("Ingrese la cantidad que desea comprar del producto. Si desea volver al menú anterior, ingrese 0."));
+            }
+            
+            if (cantidadAComprar === 0) break;
+            
+            let resultadoCompra = comprar(productoAComprar, cantidadAComprar);
+            alert(resultadoCompra);
+            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+            break;
+        case 3:
+            añadirProductosAlStock ();
+            console.log(productos);
+            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+            break;
+        case 4:
+            añadirProdctoPorPrompt();
+            console.log(productos);
+            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+            break;
+        default: 
+            alert("El valor ingresado no corresponde a ninguna acción, por favor ingrese un valor nuevo");
+            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+    }
+}
+
+
+
+
+
+
+
 //! PRIMER PREENTREGA, CALCULADORA DE IMC
 
 // Funciones y variables
 
-let peso = 0;
-let altura = 0;
+// let peso = 0;
+// let altura = 0;
 
-// Función para solicitar y validar el ingreso de peso y altura
-function calculadoraIMC () {
-    // Solicita el peso del usuario y valida que sea un número positivo
-    let peso = parseFloat(prompt("Ingrese su peso en kilogramos (ej: 70kg)"));
+// // Función para solicitar y validar el ingreso de peso y altura
+// function calculadoraIMC () {
+//     // Solicita el peso del usuario y valida que sea un número positivo
+//     let peso = parseFloat(prompt("Ingrese su peso en kilogramos (ej: 70kg)"));
 
-    while (peso <=0 || isNaN(peso)) {
-        alert("Por favor, ingrese un valor válido para el peso");
-        peso = parseFloat(prompt("Ingrese su peso en kilogramos (ej: 70kg)"));
-    }
+//     while (peso <=0 || isNaN(peso)) {
+//         alert("Por favor, ingrese un valor válido para el peso");
+//         peso = parseFloat(prompt("Ingrese su peso en kilogramos (ej: 70kg)"));
+//     }
     
-    // Solicita la altura del usuario y valida que sea un número positivo
-    let altura = parseFloat(prompt("Ingrese su altura en metros (ej:1.70m)"));
+//     // Solicita la altura del usuario y valida que sea un número positivo
+//     let altura = parseFloat(prompt("Ingrese su altura en metros (ej:1.70m)"));
     
-    while (altura <=0 || isNaN(altura)) {
-        alert("Por favor, ingrese un valor válido para la altura");
-        altura = parseFloat(prompt("Ingrese su altura en metros (ej:1.70m)"));
-    }
-    // Calcula el IMC basado en el peso y la altura
-    imc = (a, b) => a / (b * b) 
-    const resultadoIMC = imc (peso, altura) 
+//     while (altura <=0 || isNaN(altura)) {
+//         alert("Por favor, ingrese un valor válido para la altura");
+//         altura = parseFloat(prompt("Ingrese su altura en metros (ej:1.70m)"));
+//     }
+//     // Calcula el IMC basado en el peso y la altura
+//     imc = (a, b) => a / (b * b) 
+//     const resultadoIMC = imc (peso, altura) 
     
-    // Muestra el IMC calculado al usuario y una categoría basada en el valor del IMC
-    alert("Su índice de masa corporal es equivalente a " + resultadoIMC.toFixed(2));
+//     // Muestra el IMC calculado al usuario y una categoría basada en el valor del IMC
+//     alert("Su índice de masa corporal es equivalente a " + resultadoIMC.toFixed(2));
     
-    if (resultadoIMC <= 16.00) {
-        alert ("Usted está severamente delgado");
-    } else if ((resultadoIMC > 16.00) && (resultadoIMC <= 17.00)){
-        alert ("Usted está moderadamente delgado");
-    } else if ((resultadoIMC > 17.00) && (resultadoIMC <= 18.50)) {
-        alert ("Usted está levemente delgado");
-    } else if ((resultadoIMC > 18.50) && (resultadoIMC <= 25.00)) {
-        alert ("Usted está en su peso ideal");
-    } else if ((resultadoIMC > 25.00) && (resultadoIMC <= 30.00)) {
-        alert ("Usted tiene sobrepeso");
-    } else if ((resultadoIMC > 30.00) && (resultadoIMC <= 35.00)) {
-        alert ("Usted tiene obesidad leve");
-    }else if ((resultadoIMC > 35.00) && (resultadoIMC <= 40.00)) {
-        alert ("Usted tiene obesidad moderada");
-    }else if (resultadoIMC > 40.00) {
-        alert ("Usted tiene obesidad mórbida");
-    }
+//     if (resultadoIMC <= 16.00) {
+//         alert ("Usted está severamente delgado");
+//     } else if ((resultadoIMC > 16.00) && (resultadoIMC <= 17.00)){
+//         alert ("Usted está moderadamente delgado");
+//     } else if ((resultadoIMC > 17.00) && (resultadoIMC <= 18.50)) {
+//         alert ("Usted está levemente delgado");
+//     } else if ((resultadoIMC > 18.50) && (resultadoIMC <= 25.00)) {
+//         alert ("Usted está en su peso ideal");
+//     } else if ((resultadoIMC > 25.00) && (resultadoIMC <= 30.00)) {
+//         alert ("Usted tiene sobrepeso");
+//     } else if ((resultadoIMC > 30.00) && (resultadoIMC <= 35.00)) {
+//         alert ("Usted tiene obesidad leve");
+//     }else if ((resultadoIMC > 35.00) && (resultadoIMC <= 40.00)) {
+//         alert ("Usted tiene obesidad moderada");
+//     }else if (resultadoIMC > 40.00) {
+//         alert ("Usted tiene obesidad mórbida");
+//     }
     
-    alert("Muchas gracias por usar la calculadora de IMC, que tengas buen día.")
-}
+//     alert("Muchas gracias por usar la calculadora de IMC, que tengas buen día.")
+// }
 
-// Función para permitir al usuario repetir la calculadora
-function repetirCalculadora () {
-    let otra = prompt("Le gustaría volver a usar la calculadora? Escriba 'Si' o 'No'");
-    while (otra != "No") {
-        switch (otra) {
-            case "Si":
-                calculadoraIMC ();
-                break;
-            case "No":
-                break;
-            default: alert ("Por favor, escriba 'Si' o 'No' para volver a usar la calculadora o finalizar el proceso");
-            break;
-        }
-        otra = prompt("¿Le gustaría volver a usar la calculadora? Escriba 'Si' o 'No'");
-    }
-}
-
-
-// -------- //
+// // Función para permitir al usuario repetir la calculadora
+// function repetirCalculadora () {
+//     let otra = prompt("Le gustaría volver a usar la calculadora? Escriba 'Si' o 'No'");
+//     while (otra != "No") {
+//         switch (otra) {
+//             case "Si":
+//                 calculadoraIMC ();
+//                 break;
+//             case "No":
+//                 break;
+//             default: alert ("Por favor, escriba 'Si' o 'No' para volver a usar la calculadora o finalizar el proceso");
+//             break;
+//         }
+//         otra = prompt("¿Le gustaría volver a usar la calculadora? Escriba 'Si' o 'No'");
+//     }
+// }
 
 
-// Inicio del programa
-alert("Bienvenido a la calculadora de Índice de Masa Corporal (IMC), por favor, ingrese sus datos:");
+// // -------- //
 
-calculadoraIMC ();
-repetirCalculadora();
-// -------- //
+
+// // Inicio del programa
+// alert("Bienvenido a la calculadora de Índice de Masa Corporal (IMC), por favor, ingrese sus datos:");
+
+// calculadoraIMC ();
+// repetirCalculadora();
+// // -------- //
 
 
 //! ////////////////////
@@ -1278,7 +1430,7 @@ repetirCalculadora();
 
 
 
-//TODO EJERCICIOS: (0/8)
+//TODO EJERCICIOS: (7/8)
 
 
 /*
@@ -1288,6 +1440,23 @@ repetirCalculadora();
 * b) mostrarAutor() que muestre el autor de la canción
 */
 
+// class Cancion {
+//     constructor(titulo, autor) {
+//         this.titulo = titulo;
+//         this.autor =  autor;
+//     }
+//     mostrarTitulo = () => "Titulo: " + this.titulo;
+//     mostrarAutor = () => "Autor: " + this.autor;
+// }
+
+// const cancion1 = new Cancion("Bajan", "Gustavo Cerati");
+// const cancion2 = new Cancion("Mondongo", "Goku");
+
+// console.log(cancion1.mostrarTitulo());
+// console.log(cancion1.mostrarAutor()); 
+
+// console.log(cancion2.mostrarTitulo());
+// console.log(cancion2.mostrarAutor()); 
 
 
 
@@ -1297,6 +1466,30 @@ repetirCalculadora();
 * a) mostrar() que muestre los datos de la persona
 * b) esMayor() que devuelva un valor booleano si es mayor de edad o no
 */
+
+// class Persona {
+//     constructor(nombre, edad, DNI) {
+//         this.nombre = nombre;
+//         this.edad = edad;
+//         this.DNI = DNI;
+//     }
+    
+//     mostrarPersona = () => "La persona es " + this.nombre + " de " + this.edad + " años de edad y con DNI " + this.DNI;
+//     esMayor = () => {if (this.edad >= 18) {
+//         return "La persona es mayor de edad";
+//     } else {
+//         return "La persona es menor de edad";
+//     }}
+// }
+
+// const persona1 = new Persona ("Pepe", 25, 12345678);
+// const persona2 = new Persona ("Santi", 18, 5562710-8);
+
+// console.log(persona1.mostrarPersona());
+// console.log(persona1.esMayor());
+// console.log(" ");
+// console.log (persona2.mostrarPersona());
+// console.log(persona2.esMayor());
 
 
 
@@ -1311,6 +1504,30 @@ repetirCalculadora();
 * c) retirar(cantidad) se retira una cantidad de la cuenta.
 */
 
+// class Cuenta {
+//     constructor (a, b) {
+//         this.titular = a;
+//         this.cantidad = b 
+//     }
+//     mostrar = () => "El titular de esta cuenta es " + this.titular + ". Su balance es de $" + this.cantidad;
+//     ingresar = (cantidad) => {if (cantidad > 0) {
+//         this.cantidad += cantidad;
+//     }
+//     return "Nuevo balance: $" + this.cantidad;
+//     }
+//     retirar = (cantidad) => {if (cantidad > this.cantidad) {
+//         return "No puede retirar más de su balance. Balance actual: $" + this.cantidad;
+//     }
+//     this.cantidad -= cantidad;
+//     return "Nuevo balance: $" + this.cantidad;}
+// }
+
+// const persona1 = new Cuenta ("Sebastian", 500);
+
+// console.log(persona1.mostrar());
+// console.log(persona1.ingresar(250));
+// console.log(persona1.retirar(100));
+
 
 
 
@@ -1324,6 +1541,28 @@ repetirCalculadora();
 * d) dividir() que divida los 2 números y devuelva su resultado
 */
 
+// class Calculadora {
+//     constructor (a, b) {
+//         this.numero1 = a;
+//         this.numero2 = b;
+//     }
+//     multiplicar = () => this.numero1 * this.numero2;
+//     sumar = () => this.numero1 + this.numero2;
+//     restar = () => this.numero1 - this.numero2;
+//     dividir = () => this.numero1 / this.numero2;
+// }
+
+// let a = parseFloat(prompt("Ingrese su primer número"));
+// let b = parseFloat(prompt("Ingrese su primer número"));
+
+// let calculo = new Calculadora (a, b);
+
+// console.log (calculo.multiplicar());
+// console.log (calculo.sumar());
+// console.log (calculo.restar());
+// console.log (calculo.dividir());
+
+
 
 
 
@@ -1336,6 +1575,38 @@ repetirCalculadora();
 * b) devolver() que devuelva el libro (poner prestado en false). Si el libro no se
 * encuentra prestado, debe mostrar un alert informándolo.
 */
+
+// class Libro {
+//     constructor (a, b, c = false) {
+//         this.titulo = a;
+//         this.autor = b;
+//         this.prestado = c;
+//     }
+//     prestamo = () =>{if (this.prestado) {
+//         alert ("El libro ya está prestado");
+//         return "El libro ya está prestado";
+//     } else {
+//         this.prestado = true;
+//         alert ("Usted ha pedido el libro " + this.titulo + " de " + this.autor + " prestado. Muchas gracias por confiar en nosotros");
+//         return "El libro ha sido prestado exitosamente";
+//     }
+//     }
+//     devolver = () => {
+//         if (this.prestado) {
+//             this.prestado = false
+//             alert ("Muchas gracias por devolver " + this.titulo + " de " + this.autor);
+//             return "El libro ha sido devuelto";
+//         } else {
+//             alert ("El libro ya se encuentra en nuestra posesión");
+//             return "El libro ya se encuentra en nuestra posesión";
+//         }
+//     } 
+// }
+
+// const libro1 = new Libro ("1984", "George Orwell", false);
+
+// console.log(libro1.prestamo());
+// console.log(libro1.devolver());
 
 
 
@@ -1355,6 +1626,49 @@ repetirCalculadora();
 * Validar que si la cafetera está llena ya, no la pueda llenar otra vez.
 */
 
+// class Cafetera {
+//     constructor (a, b) {
+//         this.cantidadMaxima = a;
+//         this.cantidadActual = b;
+//     }
+//     servirTaza = () => {
+//         if (this.cantidadActual > 0) {
+//             this.cantidadActual -= 1;
+//             alert ("Taza servida, disfrute su café")
+//             return "La cantidad actual es " + this.cantidadActual;
+//         } else {
+//             alert ("La cantidad actual es insuficiente para servir una taza")
+//         }
+//     }
+//     vaciarCafetera = () =>{
+//         this.cantidadActual = 0;
+//         return "La cafetera ha sido vaciada, cantidad actual: " + this.cantidadActual;
+//     } 
+//     agregarCafe = (cantidad) => {
+//         if (this.cantidadActual + cantidad <= this.cantidadMaxima) {
+//             this.cantidadActual += cantidad;
+//             return "la cantidad actual es " + this.cantidadActual;
+//         } else {
+//             alert("La cantidad que desea agregar supera la capacidad máxima de la cafetera")
+//         }
+//     }
+//     llenarCafetera = () => {
+//         if (this.cantidadActual == this.cantidadMaxima) {
+//             alert("No se puede añadir más café a la máquina")
+//         } else {
+//             this.cantidadActual = this.cantidadMaxima;
+//             return "La cafetera se ha llenado, cantidad actual: " + this.cantidadActual;
+//         }
+//     }
+// }
+
+// const cafetera1 = new Cafetera (50, 20);
+
+// console.log(cafetera1.servirTaza());
+// console.log(cafetera1.vaciarCafetera());
+// console.log(cafetera1.agregarCafe(10));
+// console.log(cafetera1.llenarCafetera());
+
 
 
 
@@ -1364,6 +1678,28 @@ repetirCalculadora();
 * disminuya la velocidad del coche en 10 km/h.
 */
 
+// class Coche {
+//     constructor (a, b, c, d) {
+//         this.marca = a;
+//         this.modelo = b;
+//         this.año = c;
+//         this.velocidad = d;
+//     }
+//     acelerar = () => this.velocidad += 10
+//     disminuir = () => this.velocidad -= 10
+// }
+
+// const coche1 = new Coche ("Geely", "Sheely", "2014", 50);
+
+// console.log (coche1.acelerar());
+// console.log (coche1.acelerar());
+// console.log (coche1.acelerar());
+// console.log (coche1.acelerar());
+
+// console.log (coche1.disminuir());
+// console.log (coche1.disminuir());
+// console.log (coche1.disminuir());
+
 
 
 
@@ -1371,3 +1707,1088 @@ repetirCalculadora();
 * 8) Crear un objeto Producto con las propiedades nombre, precio y stock. Crea un
 * método vender() que reduce el stock del producto en 1 unidad.
 */
+
+//! //////////////////
+
+
+
+
+
+//! CLASE 6, ARRAYS
+
+//TODO EJEMPLOS:
+
+
+/*
+? RECORRER UN ARRAY
+*/
+
+// const nombresDeProductos = [
+//     'Yogurt',
+//     'Leche',
+//     'Manteca',
+//     'Lechuga',
+//     'Tomate',
+//     'Papa',
+// ];
+
+// for(let i = 0; i < nombresDeProductos.length; i++) {
+//     console.log(nombresDeProductos[i]);
+// }
+
+
+
+/*
+? AGREGAR ELEMENTOS A LA LISTA
+*/
+
+// const nombres = ["Juan", "Pedro"];
+
+//* Forma 1
+// nombres.push("Mariano");
+// nombres.push("Pepe");
+//console.log (nombres)
+
+//* Forma 2 - Varios elementos a la vez
+// nombres.push("Mariano", "Pepe");
+// nombres.unshift("Andres");
+// console.log(nombres);
+
+
+
+/*
+? ELIMINAR ELEMENTOS DEL ARRAY
+*/
+
+// const productos = [
+//     'Leche',
+//     'Tomates',
+//     'Papa',
+//     'Crema',
+// ];
+// console.log(productos);
+
+// // Elimina al final
+// productos.pop();
+// console.log(productos);
+
+// // Elimina al principio
+// productos.shift();
+// console.log(productos);
+
+
+//* SPLICE
+
+// const productos = [
+//     'Leche',
+//     'Tomates',
+//     'Papa',
+//     'Crema',
+//     'Jabon',
+// ];
+
+// // Eliminar elementos del medio
+// productos.splice(1, 3);
+
+// // Eliminar desde el índice en adelante
+// productos.splice(2);
+
+// // Eliminar los 2 primeros elementos
+// productos.splice(0, 2);
+
+// // Esto no elimina nada
+// productos.splice(1, 0);
+
+// // El método splice me devuelve un nuevo array con los elementos eliminados
+// const eliminados = productos.splice(1, 2);
+
+// console.log(productos);
+
+
+
+
+//TODO EJERCICIOS: (7/9)
+
+
+/*
+* 1) Escribir un programa en donde el usuario ingrese números, esos números se
+* carguen en un array. Luego recorrer el array y determinar cuál es el mayor, el menor
+* y la media.
+*/
+
+// let numeros = []; // Array para almacenar los números ingresados
+// let input;
+
+// while (true) {
+//     input = prompt("Ingrese un número o escriba 'Salir' para terminar:");
+
+//     if (input.toLowerCase() === "salir") {
+//         break; // Si el usuario escribe 'Salir', el ciclo se detiene
+//     }
+
+    // let numero = parseFloat(input);
+
+    // if (!isNaN(numero)) {
+    //     numeros.push(numero); // Agrega el número al array si es válido
+    // } else {
+    //     alert("Por favor, ingrese un número válido."); // Si no es un número válido, muestra una alerta
+    // }
+// }
+
+
+// console.log(numeros); // Muestra el array con los números ingresados
+
+
+
+
+/*
+* 2) Escribir un programa en donde el usuario ingrese no más de 10 números, luego
+* calcular la media de los números ingresados
+*/
+
+// let numerosArray = [];
+// let input;
+// let contador = 0;
+
+// while (contador <= 10) {
+//     input = prompt("Ingrese un número o escriba 'Salir' para terminar:");
+//     contador++;
+//     if (input.toLowerCase() === "salir") {
+//         break;
+//     }
+//     let numero = parseFloat(input);
+
+//     if (!isNaN(numero)) {
+//         numerosArray.push(numero);
+//     } else {
+//         alert("Por favor, ingrese un número válido.");
+//     }
+// }
+
+// console.log(numerosArray);
+
+// if (numerosArray.length > 0) {  // Asegurarse de que hay números en el array
+//     let suma = 0;
+
+//     for (let i = 0; i < numerosArray.length; i++) {
+//         suma += numerosArray[i]; // Sumar todos los números del array
+//     }
+
+//     let promedio = suma / numerosArray.length; // Calcular el promedio
+//     console.log("La media de los números ingresados es: " + promedio);
+// } else {
+//     console.log("No se ingresaron números válidos.");
+// }
+
+
+
+
+/*
+* 3) Dados los siguientes arrays
+* a) [1, 3, 5, 6, 7, 9]
+* b) [1, 2, 3, 4, 7, 8]
+* Generar un nuevo array con la intersección de los elementos
+*/
+
+// let a = [1, 3, 5, 6, 7, 9];
+// let b = [1, 2, 3, 4, 7, 8];
+
+// let interseccion = a.filter(num => b.includes(num));
+
+// console.log("Intersección:", interseccion);
+
+
+
+
+/*
+* 4) Ídem ejercicio anterior pero en vez de la intersección, generar un nuevo array con la
+* unión de los elementos (Sin repetirlos).
+*/
+
+// let a = [1, 3, 5, 6, 7, 9];
+// let b = [1, 2, 3, 4, 7, 8];
+// let c = []
+
+// // Añadimos los elementos de 'a' a 'c'
+// for (let i = 0; i < a.length; i++) {
+//     if (!c.includes(a[i])) { // Verificamos que no esté ya en 'c'
+//         c.push(a[i]);
+//     }
+// }
+
+// // Añadimos los elementos de 'b' a 'c' si no están ya en 'c'
+// for (let i = 0; i < b.length; i++) {
+//     if (!c.includes(b[i])) { // Verificamos que no esté ya en 'c'
+//         c.push(b[i]);
+//     }
+// }
+// console.log(c);
+
+//!     IMPORTANTE 
+
+/*
+* En "(!c.includes(a[i]))" el está diciendo que si NO(!) está incluido en
+* el array "c" (c.includes), entonces el VALOR en el índice "i (del ciclo)"
+* del array "a" (a[i]), entonces se pushea el número.
+*/
+
+
+
+
+/*
+* 5) Solicitarle al usuario un número N. Luego, generar un array de N cantidad de
+* elementos, donde los elementos tienen que ser múltiplos de N.
+* Nota: N tiene que ser mayor a 0 y menor a 100
+*/
+
+// let numero = parseInt(prompt("Ingrese un numero entero entre 1 y 99"));
+
+// while (numero < 1 || numero > 99 || isNaN(numero)){
+//     alert ("El número ingresado es inválido, por favor, ingrese un número nuevo");
+//     numero = parseInt(prompt("Ingrese un numero entero entre 1 y 99"));
+// }
+
+// let numeroArray = [];
+
+// for (let i = 0; i <= numero; i++) {
+//     numeroArray.push([i] * numero);
+// }
+
+// console.log(numeroArray);
+
+
+
+
+/*
+* 6) Escriba una función que sume todos los elementos de un array de números. Ej: Si se
+* le da el array [3, 5, 8, 1] tiene que devolver 17.
+*/
+
+// let arrayNumeros = [3, 5, 8, 1];
+// let contador1 = 0
+
+// for (let i = 0; i < arrayNumeros.length; i++) {
+//     contador1 += arrayNumeros[i]
+// }
+
+// console.log(contador1);
+
+
+//* Con input humano
+
+// let arrayNumeros2 = [];
+// let contador2 = 0;
+
+
+// let numeros = prompt("Ingrese sus números");
+
+// while (numeros.toLowerCase() !== "salir") {
+//     if (isNaN(numeros) || numeros === null || numeros.trim() === ""){
+//         alert ("El número ingresado es inválido, por favor, ingrese un número nuevo");
+//         numeros = prompt("Ingrese sus números");
+//     } else {
+//         arrayNumeros2.push(parseFloat(numeros));
+//         numeros = prompt("Ingrese sus números");
+//     } 
+// }
+// console.log(arrayNumeros2)
+
+// for (let i = 0; i < arrayNumeros2.length; i++) {
+//     contador2 += arrayNumeros2[i];
+// }
+
+// console.log(contador2);
+
+
+
+
+/*
+* 7) Escriba una función que tome un array de números y devuelva un nuevo array solo
+* con los números pares. Ej: Si se le da el array [1, 3, 4, 6, 8, 9] tiene que devolver el
+* array [4, 6, 8]
+*/
+
+// let numerosArray = [1, 3, 4, 6, 8, 9];
+// let numerosArray2 = []
+
+// for (let i = 0; i < numerosArray.length; i++) {
+//     if (numerosArray[i] % 2 == 0) {
+//         numerosArray2.push(numerosArray[i]);
+//     }
+// }
+
+// console.log(numerosArray2);
+
+
+
+//* Con input humano 
+
+// let numerosArray = []
+// let numerosArrayPares = []
+
+// let numeros = prompt("Ingrese un número");
+
+// while (numeros.toLowerCase() !== "salir") {
+//     if (isNaN(numeros) || numeros === null || numeros.trim() === ""){
+//         alert ("El número ingresado es inválido, por favor, ingrese un número nuevo");
+//         numeros = prompt("Ingrese sus números");
+//     } else {
+//         numerosArray.push(parseInt(numeros));
+//         numeros = prompt("Ingrese sus números");
+//     }
+// }
+
+// console.log(numerosArray);
+
+// for (let i = 0; i < numerosArray.length; i++) {
+//     if (numerosArray[i] % 2 == 0) {
+//         numerosArrayPares.push(numerosArray[i]);
+//     }
+// }
+
+// console.log(numerosArrayPares);
+
+
+
+
+/*
+* 8) Dado el siguiente array:
+* a) [2, 7, 6, 8, 3, 2, 3, 4, 7, 5, 6]
+* Generar un nuevo array en dónde se eliminen los elementos repetidos, por lo
+* que el resultado sería: [2, 7, 6, 8, 3, 4, 5]
+*/
+
+
+
+
+
+
+/*
+* 9) Escriba una función que tome un array de números y un número, y devuelva un
+* nuevo array donde cada elemento se multiplica por ese número. Ej: Se le da el array
+* [2, 4, 5, 6] y se envía el número 3, por lo que el array resultante tiene que ser: [6, 12,
+* 15, 18]
+*/
+
+//! //////////////////
+
+
+
+
+
+//! CLASE 7, FUNCIONES DE ORDEN SUPERIOR
+
+//TODO EJEMPLOS:
+
+//* FUNCIÓN DE ÓRDEN SUPERIOR
+
+// function mayorQue (numeroAComparar) {
+//     return function(numero) {
+//         return numero > numeroAComparar;
+//     }
+// }
+
+// const mayorQueDiez = mayorQue(10);
+// /*
+// function(numero) {
+//     return numero > 10;
+// }
+// */
+
+
+// const mayorQueVeinte = mayorQue(20);
+// /*
+// function(numero) {
+//     return numero > 20;
+// }
+// */
+
+
+// const mayorQueQuince = mayorQue(15);
+// /*
+// function(numero) {
+//     return numero > 15;
+// }
+// */
+
+
+// const mayorQueTreinta = mayorQue(30);
+// /*
+// function(numero) {
+//     return numero > 30;
+// }
+// */
+
+
+
+// // INICIO DEL PROGRAMA
+
+// console.log(mayorQueDiez(20));
+// console.log(mayorQueVeinte(20));
+// console.log(mayorQueQuince(20));
+
+
+
+/*
+* FUNCIONES QUE RECIBAN OTRA FUNCIÓN COMO PARAMÉTRO
+*/
+
+// function porCadaUno (arr, funcion) {
+//     for(const elemento of arr) {
+//         funcion(elemento);
+//     }
+// }
+
+// const numeros = [1, 2, 3, 4, 5];
+
+// porCadaUno(numeros, function (el) {
+//     console.log(el * 2);
+// });
+
+// porCadaUno(numeros, function (el) {
+//     console.log("Se está recorriendo el elemento: " + el);
+// });
+
+
+
+/*
+* FUNCIONES DE ÓRDEN SUPERIOR
+*/
+
+//? FOR EACH
+
+// const personas = [
+//     {
+//         nombre: "Pepe",
+//         edad: 15,
+//         profesion: "Plomero",
+//     },
+//     {
+//         nombre: "Juan",
+//         edad: 25,
+//         profesion: "Gasista",
+//     },
+//     {
+//         nombre: "Pedro",
+//         edad: 20,
+//         profesion: "Electricista",
+//     },
+//     {
+//         nombre: "Juan",
+//         edad: 45,
+//         profesion: "Barrendero",
+//     },
+// ];
+
+// personas.forEach( (el) => {
+//      console.log("El nombre es: " + el.nombre);
+// });
+
+//? FIND
+
+// const juan = personas.find( (el) => {
+//     return el.nombre === "Juan";
+// });
+
+//? FILTER
+
+// const juanes = personas.filter( (el) => {
+//     return el.nombre === "Juan";
+// });
+
+//? SOME
+
+// const existePepe = personas.some( (el) => {
+//     return el.nombre === "qwjkeqwjkeqwkjeqwjk";
+// });
+
+//? MAP
+
+// const edades = personas.map( (el) => {
+//     return el.edad;
+// });
+
+// const personasSinEdad = personas.map( (el) => {
+//     return {
+//         nombre: el.nombre,
+//         profesion: el.profesion,
+//     }
+// });
+//
+// console.log(personasSinEdad);
+
+//? REDUCE
+
+// const carrito = [
+//     {
+//         nombre: "Yogurt",
+//         precio: 15,
+//         cantidad: 2,
+//     },
+//     {
+//         nombre: "Pepino",
+//         precio: 20,
+//         cantidad: 4,
+//     },
+//     {
+//         nombre: "Leche",
+//         precio: 25,
+//         cantidad: 3,
+//     },
+//     {
+//         nombre: "Lechuga",
+//         precio: 20,
+//         cantidad: 1,
+//     },
+//     {
+//         nombre: "laurel",
+//         precio: 40,
+//         cantidad: 2,
+//     },
+// ];
+
+// const subtotal = carrito.reduce( (acc, el) => {
+//     return acc + (el.precio * el.cantidad);
+// }, 0);
+
+// console.log(subtotal);
+
+//? SORT
+
+//* ORDENAR POR PRECIO
+// carrito.sort( (a, b) => {
+//     if(a.precio > b.precio) {
+//         return 1;
+//     } else if(a.precio < b.precio) {
+//         return -1;
+//     } else {
+//         return 0;
+//     }
+// });
+
+//* ORDENAR POR NOMBRE
+// carrito.sort( (a, b) => {
+//     if(a.nombre.toLowerCase() > b.nombre.toLowerCase()) {
+//         return 1;
+//     } else if(a.nombre.toLowerCase() < b.nombre.toLowerCase()) {
+//         return -1;
+//     } else {
+//         return 0;
+//     }
+// });
+
+// console.log(carrito);
+
+
+
+
+
+
+//! EJERCICIOS EXTRA DE CHATGPT
+
+// // Función map() 
+
+// const numeros1 = [1, 2, 3, 4, 5];
+// const dobles = numeros1.map(function(num) {
+//     return num * 2;
+// });
+// console.log(dobles);  // [2, 4, 6, 8, 10]
+
+
+// // Función filter
+
+// const numeros2 = [1, 2, 3, 4, 5, 6];
+// const pares = numeros2.filter(function(num) {
+//     return num % 2 === 0;
+// });
+// console.log(pares);  // [2, 4, 6]
+
+
+// // Función reduce ()
+
+// const numeros3 = [1, 2, 3, 4, 5];
+// const suma = numeros3.reduce(function(acumulador, actual) {
+//     return acumulador + actual;
+// }, 0);
+// console.log(suma);  // 15
+
+
+// // Función toUpperCase()
+
+// const palabras = ['hola', 'mundo', 'javascript'];
+// const mayusculas = palabras.map(function(palabra) {
+//     return palabra.toUpperCase();
+// });
+// console.log(mayusculas);  // ['HOLA', 'MUNDO', 'JAVASCRIPT']
+
+
+
+// /*
+// * EJERCICIOS DE CHATGPT
+// */
+
+// /*
+// * 1) Convertir grados Celsius a Fahrenheit:
+// * Tienes un array de temperaturas en grados Celsius. Usa map para convertirlas a Fahrenheit.
+// * Fórmula: F = C * 9/5 + 32.
+// * Instrucciones:
+
+// * Crea un array con algunas temperaturas en Celsius.
+// * Usa map para convertirlas a Fahrenheit.
+// * Muestra el array resultante por consola.
+// */
+
+// const arrayTemperaturas = [50, 20, 11, 3, 41];
+// const conversion = arrayTemperaturas.map(function(temp) {
+//     return temp * 9/5 + 32;
+// })
+// console.log(conversion);
+
+
+
+// /*
+// * 2) Filtrar palabras con más de 5 caracteres:
+// * Tienes un array de palabras. Usa filter para quedarte solo con las palabras que tengan más de 5 caracteres.
+// * Instrucciones:
+// * 
+// * Crea un array con algunas palabras.
+// * Usa filter para obtener las palabras largas.
+// * Muestra el nuevo array por consola.
+// */
+
+// const arrPalabras = ['hola', 'mundo', 'javascript', `mondongo`, `papa`, `css`, `boniato`, `estreptococo`];
+// const filtrado = arrPalabras.filter(function (palabra) {
+//     return palabra.length > 5
+// })
+// console.log(filtrado);
+
+
+// /*
+// * 3) Suma los números impares de un array:
+// * Usa reduce para sumar solo los números impares de un array.
+// * Instrucciones:
+
+// * Crea un array con algunos números.
+// * Usa filter para obtener los números impares.
+// * Usa reduce para sumar esos números.
+// * Muestra el resultado por consola.
+// */
+
+// //* salió mal
+// const arrImpares = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+// const sumaImpares = arrImpares.reduce(function (acumulador, valorActual) {
+//     if (valorActual % 2 !== 0) {
+//         return valorActual + acumulador;
+//     }
+// }, 0);
+// console.log(sumaImpares);
+
+
+
+
+
+
+
+//TODO EJERCICIOS: (0/8)
+
+
+
+/*
+* 1) Dado el siguiente array de arrays, se pide transformarlo para que de como
+* resultado un único array con todos los elementos. Para ese ejemplo, el array
+* resultante sería: [1, 2, 3, 4, 5, 6, 7, 8, 9].
+* const listaNumeros = [
+*    [1, 2, 3],
+*    [4, 5, 6],
+*    [7, 8, 9],
+* ];
+*/
+
+// const listaNumeros = [
+//     [1, 2, 3],
+//     [4, 5, 6],
+//     [7, 8, 9],
+// ]
+// let numerosArray = []
+
+// const x = listaNumeros.map((arr) => {
+//     for (let i = 0; i < arr.length; i++) {
+//         numerosArray.push(arr[i]);
+//     }
+// });
+// console.log(numerosArray);
+
+// ! Hecho con ayuda
+
+
+
+
+/*
+* 2) Dado el siguiente array
+* a. Se pide primero obtener todas las personas del género femenino (genero = “F”)
+* b. Una vez obtenidas, se pide calcular el promedio de edad sobre ellas
+* const listaPersonas = [
+*    { nombre: "Matias", genero: "M", edad: 25 },
+*    { nombre: "Fernanda", genero: "F", edad: 27 },
+*    { nombre: "Federico", genero: "M", edad: 32 },
+*    { nombre: "Camila", genero: "F", edad: 12 },
+*    { nombre: "Gabriela", genero: "F", edad: 42 },
+* ];
+*/
+
+// const listaPersonas = [
+//     { nombre: "Matias", genero: "M", edad: 25 },
+//     { nombre: "Fernanda", genero: "F", edad: 27 },
+//     { nombre: "Federico", genero: "M", edad: 32 },
+//     { nombre: "Camila", genero: "F", edad: 12 },
+//     { nombre: "Gabriela", genero: "F", edad: 42 },
+// ];
+
+
+// const mujeres = listaPersonas.filter(function(persona) {
+//     return persona.genero === "F"
+// });
+// console.log("Personas del género femenino:", mujeres);
+
+
+
+// const promedioEdad = mujeres.reduce(function(total, persona) {
+//     return total + persona.edad;
+// }, 0) / mujeres.length;
+
+// console.log("Promedio de edad de las mujeres:", promedioEdad);
+
+// ! Hecho con ayuda
+
+
+
+
+/* 
+* 3)*  Dado el siguiente array de letras, se pide obtener cuantas veces se repite
+* cada letra. Para este ejemplo sería:
+* a: 3
+* b: 2
+* c: 1
+* d: 1
+* f: 1
+* g: 2
+* const letras = ['a', 'b', 'a', 'c', 'b', 'd', 'f', 'g', 'a']
+*/
+
+
+
+
+//! Esto es otra cosa, sin relación directa. Explica cómo usar el método filter() con todos sus parámetros
+//? filter(letra, posicion, letras) ===> 
+    //? letra = Valor literal (en este caso, la letra en sí)
+    //? posicion = El indice en el que se encuentra la letra (a, indice 0. b, indice 1, etc)
+    //? letras = El NOMBRE DEL ARRAY sobre el que está siendo aplicado el filter
+
+// const letras = ['a', 'b', 'a', 'c', 'b', 'd', 'f', 'g', 'a'];
+
+// const numerosUnicos = letras.filter ((letra, posicion, letras) => posicion === letras.indexOf(letra));
+// console.log(numerosUnicos)
+
+
+
+
+/*
+* 4) Se solicita obtener la sumatoria solamente de los números positivos.
+* const numeros = [1, -4, 12, 0, -3, 29, -150];
+*/
+
+// const numeros = [1, -4, 12, 0, -3, 29, -150];
+
+// const esPositivo = numero => numero >= 0;
+// const numerosPositivos = numeros.filter(esPositivo);
+// console.log(numerosPositivos);
+
+// let resultado = 0
+// for (let i = 0; i < numerosPositivos.length; i++) {
+//     resultado += numerosPositivos[i];
+// }
+// console.log(resultado)
+
+
+//! Con función flecha
+
+// const numeros = [1, -4, 12, 0, -3, 29, -150];
+
+// const numerosPositivos1 = numeros.filter(numero => numero >= 0)
+// console.log(numerosPositivos1);
+
+// let resultado1 = 0
+// for (let i = 0; i < numerosPositivos.length; i++) {
+//     resultado += numerosPositivos[i];
+// }
+// console.log(resultado1)
+
+
+
+
+/*
+* 5) Dado el siguiente array, se solicita aumentar los precios de todos los
+* productos en un 15%
+* const productos = [
+*    {
+*       nombre: "arroz",   
+*       precio: 20,
+*    },
+*    {
+*       nombre: "Fideos",
+*       recio: 15,
+*    },
+*    {
+*       nombre: "Tomate",
+*       precio: 5,
+*    }
+* ];
+*/
+
+// const productos = [
+// {
+//     nombre: "arroz",   
+//     precio: 20,
+// },
+// {
+//     nombre: "Fideos",
+//     precio: 15,
+// },
+// {
+//     nombre: "Tomate",
+//     precio: 5,
+// }
+// ];
+
+// const aumento = productos.map(
+//     function (producto) {
+//         return producto.precio * 1.15;
+//     }
+// );
+// console.log(aumento);
+
+
+// //! Con función flecha
+
+// const aumento1 = productos.map(producto => producto.precio * 1.15);
+// console.log(aumento1);
+
+
+
+
+/*
+* 6) Dado el siguiente array se pide obtener.
+* a. La población total de Argentina y la población total de España
+* b. Las provincias de Argentina que tienen más de 1500 habitantes
+* c. Las provincias de España que tienen más de 4000 habitantes
+* d. Cuál es la provincia de Argentina que tiene más población
+* e. Cuál es la provincia de España que tiene más población
+* const poblaciones = [
+*  {
+*   pais: "Argentina",
+*   provincia: "Buenos Aires",
+*   poblacion: 2000,
+*  },
+*  {
+*   pais: "España",
+*   provincia: "Cataluña",
+*   poblacion: 5000,
+*  },
+*  {
+*   pais: "España",
+*   provincia: "Valencia",
+*   poblacion: 2500,
+*  },
+*  {
+*   pais: "Argentina",
+*   provincia: "Santa Fe",
+*   poblacion: 1000,
+*  },
+*  {
+*   pais: "España",
+*   provincia: "Madrid",
+*   poblacion: 3000,
+*  },
+*  {
+*   pais: "Argentina",
+*   provincia: "Córdoba",
+*   poblacion: 3500,
+*  }
+* ]
+*/
+
+// const poblaciones = [
+//     {
+//     pais: "Argentina",
+//     provincia: "Buenos Aires",
+//     poblacion: 2000,
+//     },
+//     {
+//     pais: "España",
+//     provincia: "Cataluña",
+//     poblacion: 5000,
+//     },
+//     {
+//     pais: "España",
+//     provincia: "Valencia",
+//     poblacion: 2500,
+//     },
+//     {
+//     pais: "Argentina",
+//     provincia: "Santa Fe",
+//     poblacion: 1000,
+//     },
+//     {
+//     pais: "España",
+//     provincia: "Madrid",
+//     poblacion: 3000,
+//     },
+//     {
+//     pais: "Argentina",
+//     provincia: "Córdoba",
+//     poblacion: 3500,
+//     }
+// ];
+
+/*
+* PARTE A) La población total de Argentina y la población total de España.
+*/
+
+// Paises ARG
+// const esArg = poblaciones.filter(function (estePais) {
+//     if (estePais.pais == "Argentina") {
+//         return estePais;
+//     }
+// });
+// console.log(esArg);
+
+//* Total poblacion ARG
+// const poblacionArg = esArg.reduce(function (total, estaPoblacion) {
+//     return total + estaPoblacion.poblacion;
+// }, 0);
+// console.log(poblacionArg);
+
+
+// Paises ESP
+// const esEsp = poblaciones.filter(function (estePais) {
+//     if (estePais.pais == "España") {
+//         return estePais;
+//     }
+// });
+// console.log(esEsp);
+
+//* Total poblacion ESP
+// const poblacionEsp = esEsp.reduce(function (acumulador, estaPoblacion) {
+//     return acumulador + estaPoblacion.poblacion;
+// }, 0);
+// console.log(poblacionEsp);
+
+
+
+/*
+* PARTE B) Las provincias de Argentina que tienen más de 1500 habitantes.
+*/
+
+// const mas1500HabitantesArg = esArg.filter(function (provincia) {
+//     if (provincia.poblacion > 1500) {
+//         return provincia;
+//     }
+// });
+// console.log(mas1500HabitantesArg);
+
+
+
+/*
+* PARTE C) Las provincias de España que tienen más de 4000 habitantes
+*/
+
+// const mas4000HabitantesEsp = esEsp.filter(function (provincia) {
+//     if (provincia.poblacion > 4000) {
+//         return provincia;
+//     }
+// });
+// console.log(mas4000HabitantesEsp);
+
+
+
+/*
+* PARTE D) Cuál es la provincia de Argentina que tiene más población
+*/
+
+
+
+
+
+/*
+* PARTE E) Cuál es la provincia de España que tiene más población
+*/
+
+
+
+
+
+
+/*
+* 7) Dado el siguiente array, obtenga un nuevo array con las palabras que tienen 5 o más caracteres:
+* const palabras = ['casa', 'perro', 'gato', 'elefante', 'ratón]
+*/
+
+
+
+
+
+
+/*
+* 8) Dado el siguiente array, escriba una función que reciba un array y un atributo
+* y ordene el array por ese atributo:
+* const personas = [
+* { nombre: 'Juan', apellido: "Fernandez", edad: 30 },
+* { nombre: 'María', apellido: "Gomez", edad: 25 },
+* { nombre: 'Pedro', apellido: "Rodriguez", edad: 35 },
+* { nombre: 'Tomas', apellido: "Ramirez", edad: 20 },
+* { nombre: 'Matias', apellido: "Mendez", edad: 40 },
+* ];
+* const personasOrdenadasPorEdad = ordenarPorPropiedad(personas
+* console.log(personasOrdenadasPorEdad); // El array de objetos
+*/
+
+
+// const personas = [          
+//     { nombre: 'Juan', apellido: "Fernandez", edad: 30 },
+//     { nombre: 'María', apellido: "Gomez", edad: 25 },
+//     { nombre: 'Pedro', apellido: "Rodriguez", edad: 35 },
+//     { nombre: 'Tomas', apellido: "Ramirez", edad: 20 },
+//     { nombre: 'Matias', apellido: "Mendez", edad: 40 },
+// ];
+
+// function ordenarPorPropiedad (array, nombreDeLaPropiedad) {
+//     array.sort((a, b) => {
+//         if (a[nombreDeLaPropiedad] > b[nombreDeLaPropiedad]) {
+//             return 1;
+//         } else if (a[nombreDeLaPropiedad] < b[nombreDeLaPropiedad]) {
+//             return -1
+//         } else {
+//             return 0
+//         }
+//     });
+//     return array;
+// }
+
+// const ordenarPorEdad = ordenarPorPropiedad (personas, "edad");
+// console.log(ordenarPorEdad);
+
+//! //////////////////
+
+
+
+
+
+//! CLASE X, 
+
+//TODO EJEMPLOS:
+
+
+
+//TODO EJERCICIOS: (x/x)
+
+
