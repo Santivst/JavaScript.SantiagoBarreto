@@ -1,89 +1,219 @@
-//! SEGUNDA PREENTREGA, UNA VERDULERÍA
+//! TERCER PREENTREGA, JUEGO DE TRES EN RAYA CON LOCALSTORAGE Y JSON
 
 /*
 * OBJETOS
 */
 
-//* Lista original
-const productos = [
-    {verdura: "Papa", precio: 15, stock: 60},
-    {verdura: "Zanahoria", precio: 40, stock: 20},
-    {verdura: "Lechuga", precio: 30, stock: 40},
-    {verdura: "Morron", precio: 70, stock: 15},
-]
-
+class Celda {
+    constructor(id) {
+        this.id = id;
+    }
+    generarhtml() {
+        const num = this.id.replace('celda', '');
+        const divCelda = document.createElement("div");
+        divCelda.className = `celda grid__celda-${num} celda-vacia`;
+        return divCelda;
+    }
+}
 
 /*
 * FUNCIONES
 */
 
-function comprar(verdura, cantidad) {
-    // Buscar el producto en el array de productos
-    const productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === verdura.toLowerCase());
-    // Verificar si el producto existe
-    if (productoEncontrado) {
-        // Verificar si hay suficiente stock
-        if (productoEncontrado.stock >= cantidad) {
-            productoEncontrado.stock -= cantidad;  // Restar la cantidad comprada del stock
-            return `Compra exitosa. Stock restante de ${productoEncontrado.verdura}: ${productoEncontrado.stock}`;
-        } else {
-            return `No hay suficiente stock de ${productoEncontrado.verdura}. Stock actual: ${productoEncontrado.stock}`;
-        }
-    } else {
-        return "El producto seleccionado no está en nuestro catálogo.";
-    }
-}
+//* Fucnión que renderiza el tablero
+function renderizarJuego() {
+    // Limpiar el HTML
+    divGrilla.innerHTML = "";
+    // Generar de forma dinámica cada celda de la matriz con su id respectivo
+    for (let i = 0; i < celdas.length; i++) {
+        for (let j = 0; j < celdas[i].length; j++) {
+            const idCelda = celdas[i][j];
+            const celda = new Celda(idCelda);
+            const elementoCelda = celda.generarhtml();
 
+            // Restaurar el estado visual del tablero desde LocalStorage
+            if (estadoTablero[i][j] === 'azul') {
+                elementoCelda.classList.remove('celda-vacia');
+                elementoCelda.classList.add('celda-azul');
+            } else if (estadoTablero[i][j] === 'rojo') {
+                elementoCelda.classList.remove('celda-vacia');
+                elementoCelda.classList.add('celda-rojo');
+            }
 
-// Constructor para añadir productos
-class Producto {
-    constructor (verdura, precio, stock) {
-        this.verdura = verdura;
-        this.precio = parseFloat(parseFloat(precio).toFixed(2));
-        this.stock = parseInt(stock); 
-    }
-    
-    añadirALaLista = () => {productos.push(this);}
-}
-
-
-// Función para que el usuario agrege un producto por cuenta propia
-function añadirProdctoPorPrompt () {
-    const nombre = prompt("Ingrese el nombre del producto que va a añadir");
-    const precio = prompt("Ingrese el precio del producto que va a añadir");
-    const stock = prompt("Ingrese el stock del producto que va a añadir");
-
-    // Crear una nueva instancia de Producto con los valores ingresados
-    const nuevoProducto = new Producto(nombre, precio, stock);
-
-    // Añadir el nuevo producto a la lista
-    nuevoProducto.añadirALaLista();
-}
-
-
-// Función para sumarle stock a los productos que se encuentran en la lista
-function añadirProductosAlStock () {
-    let nombreDeProductoAAñadir = prompt ("Ingrese el nombre del producto al que desea añadirle unidaders existentes");
-    let productoASumar = productos.find(producto => producto.verdura.toLowerCase() === nombreDeProductoAAñadir.toLowerCase());
-
-    // Mientras no se encuentre el producto, solicitar nuevamente el input
-    while (!productoASumar) {
-        alert("Este producto no se encuentra disponible. Intente de nuevo.");
-        nombreDeProductoAAñadir = prompt("Ingrese el nombre del producto al que desea añadirle unidades existentes");
-        productoASumar = productos.find(producto => producto.verdura.toLowerCase() === nombreDeProductoAAñadir.toLowerCase());
-    }
-
-    let cantidadDeProductosAAñadir = parseInt(prompt("Ingrese la cantidad de unidades que desea añadir al stock actual"));
-    if (!isNaN(cantidadDeProductosAAñadir)) {
-        productoASumar.stock += cantidadDeProductosAAñadir;
-        alert(`Se añadieron ${cantidadDeProductosAAñadir} unidades al stock de ${productoASumar.verdura}. Stock actual: ${productoASumar.stock}`);
-    } else {
-        while (isNaN(cantidadDeProductosAAñadir) || cantidadDeProductosAAñadir < 0) {
-            alert("Cantidad inválida.");
-            cantidadDeProductosAAñadir = parseInt(prompt("Ingrese la cantidad de unidades que desea añadir al stock actual"));
+            elementoCelda.addEventListener('click', () => manejarClic(i, j, elementoCelda));
+            divGrilla.append(elementoCelda);
         }
     }
+    juegoActivo = true;
 }
+
+
+
+//* Fucnión que controla las interacciones con el tablero
+function manejarClic(i, j, elementoCelda) {
+    if (!juegoActivo || estadoTablero[i][j] !== null) {
+        return;
+    }
+
+    estadoTablero[i][j] = jugadorActual;
+    elementoCelda.classList.remove('celda-vacia');
+    elementoCelda.classList.add(`celda-${jugadorActual}`);
+
+    // Guardar el estado del juego en LocalStorage. Función declarada en la línea 160
+    guardarEstadoJuego();
+
+    // Verifica quién ganó la partida. //? Función declarada en la línea 68
+    verificarGanador();
+
+    jugadorActual = jugadorActual === 'azul' ? 'rojo' : 'azul';
+    localStorage.setItem('jugadorActual', JSON.stringify(jugadorActual));
+}
+
+
+
+//* Fucnión que verifica quién ganó la partida actual
+function verificarGanador() {
+    const combinacionesGanadoras = [
+        // Filas
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        // Columnas
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        // Diagonales
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 2], [1, 1], [2, 0]],
+    ];
+
+    for (const combinacion of combinacionesGanadoras) {
+        const [a, b, c] = combinacion;
+        const valorA = estadoTablero[a[0]][a[1]];
+        const valorB = estadoTablero[b[0]][b[1]];
+        const valorC = estadoTablero[c[0]][c[1]];
+        
+        // Si hay tres celdas consecutivas con el mismo valor, gana el jugador correspondiente
+        if (valorA && valorA === valorB && valorA === valorC) {
+            parrafoIndicativo.innerHTML = `El ganador es el jugador ${jugadorActual}!`;
+
+            // Se suma la victoria de cada jugador a LocalStorage
+            if (jugadorActual === 'azul') {
+                parrafoIndicativo.style.color = "blue";
+                victoriasAzules++;
+                localStorage.setItem('victoriasAzules', JSON.stringify(victoriasAzules));
+            } else if (jugadorActual === 'rojo') {
+                parrafoIndicativo.style.color = "red";
+                victoriasRojas++;
+                localStorage.setItem('victoriasRojas', JSON.stringify(victoriasRojas));
+            }
+            
+            // Actualizar contador de victorias
+            vecesQueGanoAzul = document.getElementById("victoriasAzul");
+            vecesQueGanoAzul.innerHTML = localStorage.getItem('victoriasAzules');
+
+            vecesQueGanoRojo = document.getElementById("victoriasRojo");
+            vecesQueGanoRojo.innerHTML = localStorage.getItem('victoriasRojas');
+
+            //Evita que se siga interactuando con el tablero. //? Función declarada en la línea 126
+            deshabilitarJuego();
+            return;
+        }
+    }
+
+    // Verificar empate. Genera un array unidimensional con el valor de todas las "coordenadas" de la variable "estadoTablero", 
+    // y, en caso de ser todas "null", declara un empate
+    const hayEmpate = estadoTablero.flat().every(celda => celda !== null);
+    if (hayEmpate) {
+        parrafoIndicativo.innerHTML = `Es un empate!`;
+        parrafoIndicativo.style.color = "green"
+
+        //Evita que se siga interactuando con el tablero. //? Función declarada en la línea 126
+        deshabilitarJuego();
+    }
+}
+
+
+
+//* Función que evita que se siga interactuando con el tablero
+function deshabilitarJuego() {
+    juegoActivo = false;
+    // Selecciona todas las entidades con la clase "celda" generadas en el HTML y les elimina dicha clase
+    // para que no se pueda seguir interactuando con ellas con la función "manejarClic"
+    const celdasDOM = document.querySelectorAll('.celda');
+    celdasDOM.forEach(celda => {
+        celda.removeEventListener('click', manejarClic);
+        celda.classList.add('deshabilitada');
+    });
+}
+
+
+
+//* Función que permite al botón de "REINICIAR TABLERO" y "REINICIAR MARCADOR" funcionar correctamente
+function reiniciarJuego() {
+    // Le asigna el valor de "null" a todas las coordenadas de la matriz del tablero
+    for (let i = 0; i < estadoTablero.length; i++) {
+        for (let j = 0; j < estadoTablero[i].length; j++) {
+            estadoTablero[i][j] = null;
+        }
+    }
+
+    jugadorActual = 'azul';
+    parrafoIndicativo.innerHTML = `Juego en proceso...`;
+    parrafoIndicativo.style.color = "black";
+
+    // Eliminar el estado guardado en LocalStorage
+    localStorage.removeItem('estadoTablero');
+    localStorage.removeItem('jugadorActual');
+
+    // Función que limpia el tablero. //? Declarada en la línea 24
+    renderizarJuego();
+}
+
+
+
+//* Función para reiniciar el marcador
+//! Para que se vean los efectos de esta función al apretar el botón "REINICIAR MARCADOR" hay que refrescar la página
+function reiniciarMarcador() {
+    // Vuelve al juego a su estado inicial. //? Función declarada en la línea 154
+    reiniciarJuego();
+    // Limpia el contador de victorias del LocalStorage
+    localStorage.removeItem('victoriasAzules');
+    localStorage.removeItem('victoriasRojas');
+}
+
+
+
+//* Función que perimite que la partida actual se guarde a pesar de refrescar la página
+function guardarEstadoJuego() {
+    localStorage.setItem('estadoTablero', JSON.stringify(estadoTablero));
+}
+
+
+
+//* Función que recupera el estado de la partida tras haber sido refrescada la página
+function recuperarEstadoJuego() {
+    let estadoGuardado = JSON.parse(localStorage.getItem('estadoTablero'));
+    let jugadorGuardado = JSON.parse(localStorage.getItem('jugadorActual'));
+
+    if (estadoGuardado) {
+        estadoTablero = estadoGuardado;
+        jugadorActual = jugadorGuardado || 'azul';
+        parrafoIndicativo.innerHTML = `Es el turno de ${jugadorActual}`;
+    } else {
+        jugadorActual = 'azul'; // Azul empieza si no hay datos guardados
+    }
+}
+
+
+
+//* Variables que almacenan las victorias de cada uno de los jugadores
+let vecesQueGanoAzul = document.getElementById("victoriasAzul");
+vecesQueGanoAzul.innerHTML = localStorage.getItem('victoriasAzules');
+
+let vecesQueGanoRojo = document.getElementById("victoriasRojo");
+vecesQueGanoRojo.innerHTML = localStorage.getItem('victoriasRojas');
+
 
 
 
@@ -91,60 +221,451 @@ function añadirProductosAlStock () {
 * INICIO DEL PROGRAMA
 */
 
-alert("Bienvenido a la verdulería Las Divinas. Por favor, seleccione una de las siguientes acciones:");
-let accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+const divGrilla = document.getElementById("juego__grid-principal");
+const parrafoIndicativo = document.getElementById("parrafoIndicativohtml");
 
-while (accion != 0) {
-    switch (accion) {
-        case 1:
-            alert("Nuestro catálogo incluye los siguientes productos actualmente:");
-            productos.forEach(element => {
-                alert(element.verdura + ", a $" + element.precio + ". Existencias actuales: " + element.stock + " unidades.");
-            });
-            console.log(productos);
-            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
-            break;
-        case 2: 
-            let productoAComprar = prompt("Ingrese el producto que desea comprar.");
+// Inicializar las victorias desde LocalStorage o en 0 si no existen
+let victoriasAzules = JSON.parse(localStorage.getItem('victoriasAzules')) || 0;
+let victoriasRojas = JSON.parse(localStorage.getItem('victoriasRojas')) || 0;
 
-            // Buscar el producto en el catálogo
-            let productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === productoAComprar.toLowerCase());
-            
-            // Verificar si el producto está en la lista
-            while (!productoEncontrado) {
-                productoAComprar = prompt("El producto ingresado no corresponde a ninguno en la lista. Ingrese un producto válido para continuar.");
-                productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === productoAComprar.toLowerCase());
-            }
-            
-            let cantidadAComprar = parseInt(prompt("Ingrese la cantidad que desea comprar del producto. Si desea volver al menú anterior, ingrese 0."));
-            while (cantidadAComprar < 0 || isNaN(cantidadAComprar)) {
-                alert("El valor ingresado no es válido para efectuar la compra. Porfavor, ingrese un valor válido");
-                cantidadAComprar = parseInt(prompt("Ingrese la cantidad que desea comprar del producto. Si desea volver al menú anterior, ingrese 0."));
-            }
-            
-            if (cantidadAComprar === 0) break;
-            
-            let resultadoCompra = comprar(productoAComprar, cantidadAComprar);
-            alert(resultadoCompra);
-            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
-            break;
-        case 3:
-            añadirProductosAlStock ();
-            console.log(productos);
-            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
-            break;
-        case 4:
-            añadirProdctoPorPrompt();
-            console.log(productos);
-            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
-            break;
-        default: 
-            alert("El valor ingresado no corresponde a ninguna acción, por favor ingrese un valor nuevo");
-            accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
-    }
-}
+let jugadorActual = 'azul'; // 'azul' comienza primero
+let juegoActivo = true; // Control del estado del juego
+
+let estadoTablero = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+];
+
+const celdas = [
+    ["celda1", "celda2", "celda3"],
+    ["celda4", "celda5", "celda6"],
+    ["celda7", "celda8", "celda9"],
+];
 
 
+
+
+// Botón para reiniciar el tablero
+const botonReiniciar = document.getElementById("botonReiniciarPartida");
+botonReiniciar.addEventListener("click", reiniciarJuego);
+
+// Botón para reiniciar el juego
+const botonReiniciarMarcador = document.getElementById("botonReiniciarJuegoEntero");
+botonReiniciarMarcador.addEventListener("click", reiniciarMarcador);
+
+
+
+
+// Recuperar estado del juego y renderizar
+recuperarEstadoJuego();
+renderizarJuego();
+
+
+
+
+//! ////////////////////
+
+
+
+
+/*
+! COPIA DE SEGURIDAD: PREVIO A LOCAL STORAGE Y JSON
+*/
+
+
+
+//! TERCER PREENTREGA, JUEGO DE TRES EN RAYA
+
+// /*
+// * OBJETOS
+// */
+
+// class Celda {
+//     constructor(id) {
+//         this.id = id;
+//     }
+//     generarhtml() {
+//         // Extraer el número de la celda desde el id, por ejemplo, 'celda1' -> '1'
+//         const num = this.id.replace('celda', '');
+//         // Crear un elemento div para la celda
+//         const divCelda = document.createElement("div");
+//         divCelda.className = `celda grid__celda-${num} celda-vacia`;
+//         return divCelda;
+//     }
+// }
+
+
+
+
+
+// /*
+// * FUNCIONES
+// */
+
+
+// function renderizarJuego() {
+//     divGrilla.innerHTML = "";
+//     // Recorro las celdas
+//     for (let i = 0; i < celdas.length; i++) {
+//         for (let j = 0; j < celdas[i].length; j++) {
+//             // Creo un objeto celda con el id de cada una de las recorridas
+//             const idCelda = celdas[i][j];
+//             const celda = new Celda(idCelda);
+//             // Genero el elemento celda en el HTML
+//             const elementoCelda = celda.generarhtml();
+//             // Le doy funcionalidad al clickear con una función declarada más adelante y la añado
+//             elementoCelda.addEventListener('click', () => manejarClic(i, j, elementoCelda));
+//             divGrilla.append(elementoCelda);
+//         }
+//     }
+//     juegoActivo = true;
+// }
+
+// let jugadorActual = 'azul'; // 'azul' comienza primero
+// let juegoActivo = true; // Agregada para controlar el estado del juego
+
+// // Actualiza la función manejarClic
+// function manejarClic(i, j, elementoCelda) {
+//     if (!juegoActivo || estadoTablero[i][j] !== null) {
+//         // El juego no está activo o la celda ya está ocupada
+//         return;
+//     }
+
+//     // Actualizar el estado del tablero
+//     estadoTablero[i][j] = jugadorActual;
+
+//     // Actualizar la clase CSS correspondiente
+//     elementoCelda.classList.remove('celda-vacia');
+//     elementoCelda.classList.add(`celda-${jugadorActual}`);
+
+//     // Verificar si hay un ganador
+//     verificarGanador();
+
+//     // Alternar el jugador
+//     jugadorActual = jugadorActual === 'azul' ? 'rojo' : 'azul';
+// }
+
+// // Actualiza la función deshabilitarJuego
+// function deshabilitarJuego() {
+//     juegoActivo = false; // Desactivar el juego
+//     const celdasDOM = document.querySelectorAll('.celda');
+//     celdasDOM.forEach(celda => {
+//         celda.removeEventListener('click', manejarClic); // Esto eliminará el listener del evento clic
+//         celda.classList.add('deshabilitada'); // Opcional: añade una clase para deshabilitar visualmente
+//     });
+// }
+
+// function verificarGanador() {
+//     // Definir las posibles combinaciones ganadoras
+//     const combinacionesGanadoras = [
+//         // Filas
+//         [[0, 0], [0, 1], [0, 2]],
+//         [[1, 0], [1, 1], [1, 2]],
+//         [[2, 0], [2, 1], [2, 2]],
+//         // Columnas
+//         [[0, 0], [1, 0], [2, 0]],
+//         [[0, 1], [1, 1], [2, 1]],
+//         [[0, 2], [1, 2], [2, 2]],
+//         // Diagonales
+//         [[0, 0], [1, 1], [2, 2]],
+//         [[0, 2], [1, 1], [2, 0]],
+//     ];
+
+//     for (const combinacion of combinacionesGanadoras) {
+//         const [a, b, c] = combinacion;
+//         const valorA = estadoTablero[a[0]][a[1]];
+//         const valorB = estadoTablero[b[0]][b[1]];
+//         const valorC = estadoTablero[c[0]][c[1]];
+//         if (valorA && valorA === valorB && valorA === valorC) {
+//             // Mostrar mensaje de ganador en el párrafo
+//             parrafoIndicativo.innerHTML = `El ganador es el jugador ${jugadorActual}!`
+//             if (jugadorActual == "azul") {
+//                 parrafoIndicativo.style.color = "blue";
+//             } else if (jugadorActual == "rojo") {
+//                 parrafoIndicativo.style.color = "red";
+//             }
+//             // Deshabilitar más clics o reiniciar el juego
+//             deshabilitarJuego();
+//             return;
+//         }
+//     }
+
+//     // Verificar empate
+//     const hayEmpate = estadoTablero.flat().every(celda => celda !== null);
+//     if (hayEmpate) {
+//         alert("Es un empate!")
+//         deshabilitarJuego();
+//     }
+// }
+
+// function reiniciarJuego() {
+//     // Resetear el estado del tablero
+//     for (let i = 0; i < estadoTablero.length; i++) {
+//         for (let j = 0; j < estadoTablero[i].length; j++) {
+//             estadoTablero[i][j] = null;
+//         }
+//     }
+
+//     // Resetear el jugador actual
+//     jugadorActual = 'azul';
+
+//     // Resetear el parrafo indicativo
+//     parrafoIndicativo.innerHTML = `Juego en proceso...`;
+//     parrafoIndicativo.style.color = "black";
+
+//     // Renderizar nuevamente el juego
+//     renderizarJuego();
+// }
+
+// // Botón para reiniciar la partida actual
+// const botonReiniciar = document.getElementById("botonReiniciarPartida");
+// botonReiniciar.addEventListener("click", reiniciarJuego);
+
+
+
+
+
+
+
+// /*
+// * INICIO DEL PROGRAMA
+// */
+
+// const divGrilla = document.getElementById("juego__grid-principal");
+// const parrafoIndicativo = document.getElementById("parrafoIndicativohtml");
+
+// let victoriasRojas = [];
+// let victoriasAzules = [];
+
+
+// /*
+// * Estado del juego
+// */
+// const estadoTablero = [
+//     [null, null, null],
+//     [null, null, null],
+//     [null, null, null],
+// ];
+
+
+// const celdas = [
+//     ["celda1", "celda2", "celda3"],
+//     ["celda4", "celda5", "celda6"],
+//     ["celda7", "celda8", "celda9"],
+// ];
+
+
+
+// renderizarJuego();
+
+
+
+//! ////////////////////
+
+
+
+
+
+/*
+* COSAS DESCARTADAS
+*/
+
+// function renderizarJuego() {
+//     divGrilla.innerHTML = "";
+//     // Recorro las celdas
+//     for (const filaCeldas of celdas) {
+//         // No creamos divs "fila", solo agregamos las celdas directamente al grid
+//         for (const idCelda of filaCeldas) {
+//             // Creo el objeto celda y agrego la celda al grid  
+//             const celda = new Celda(idCelda);
+//             divGrilla.append(celda.generarhtml());
+//             //// divGrilla.innerHTML += celda.generarhtml();
+//         }
+//     }
+
+//     // Intento de funcionalidad para el juego (chatgpt)
+//     const celdasDOM = document.querySelectorAll('.celda');
+//     celdasDOM.forEach(celda => {
+//         celda.addEventListener('click', () => {
+//             // Lógica para manejar el clic en la celda
+//             if (celda.classList.contains('celda-azul')) {
+//                 celda.classList.remove('celda-azul');
+//                 celda.classList.add('celda-roja');
+//             } else if (celda.classList.contains('celda-roja')) {
+//                 celda.classList.remove('celda-roja');
+//                 celda.classList.add('celda-vacia');
+//             } else if (celda.classList.contains('celda-vacia')) {
+//                 celda.classList.remove('celda-vacia');
+//                 celda.classList.add('celda-azul');
+//             }
+//             else {
+//                 celda.classList.add('celda-azul');
+//             }
+//             verificarGanador();
+//         });
+//     });
+// }
+
+
+//*  Botón para reiniciar la partida actual
+
+// const botonReiniciar = document.getElementById("botonReiniciarPartida");
+// botonReiniciar.addEventListener("click", renderizarJuego);
+
+
+
+
+
+
+//! SEGUNDA PREENTREGA, UNA VERDULERÍA
+
+// /*
+// * OBJETOS
+// */
+
+// //* Lista original
+// const productos = [
+//     {verdura: "Papa", precio: 15, stock: 60},
+//     {verdura: "Zanahoria", precio: 40, stock: 20},
+//     {verdura: "Lechuga", precio: 30, stock: 40},
+//     {verdura: "Morron", precio: 70, stock: 15},
+// ]
+
+
+// /*
+// * FUNCIONES
+// */
+
+// function comprar(verdura, cantidad) {
+//     // Buscar el producto en el array de productos
+//     const productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === verdura.toLowerCase());
+//     // Verificar si el producto existe
+//     if (productoEncontrado) {
+//         // Verificar si hay suficiente stock
+//         if (productoEncontrado.stock >= cantidad) {
+//             productoEncontrado.stock -= cantidad;  // Restar la cantidad comprada del stock
+//             return `Compra exitosa. Stock restante de ${productoEncontrado.verdura}: ${productoEncontrado.stock}`;
+//         } else {
+//             return `No hay suficiente stock de ${productoEncontrado.verdura}. Stock actual: ${productoEncontrado.stock}`;
+//         }
+//     } else {
+//         return "El producto seleccionado no está en nuestro catálogo.";
+//     }
+// }
+
+
+// // Constructor para añadir productos
+// class Producto {
+//     constructor (verdura, precio, stock) {
+//         this.verdura = verdura;
+//         this.precio = parseFloat(parseFloat(precio).toFixed(2));
+//         this.stock = parseInt(stock); 
+//     }
+    
+//     añadirALaLista = () => {productos.push(this);}
+// }
+
+
+// // Función para que el usuario agrege un producto por cuenta propia
+// function añadirProdctoPorPrompt () {
+//     const nombre = prompt("Ingrese el nombre del producto que va a añadir");
+//     const precio = prompt("Ingrese el precio del producto que va a añadir");
+//     const stock = prompt("Ingrese el stock del producto que va a añadir");
+
+//     // Crear una nueva instancia de Producto con los valores ingresados
+//     const nuevoProducto = new Producto(nombre, precio, stock);
+
+//     // Añadir el nuevo producto a la lista
+//     nuevoProducto.añadirALaLista();
+// }
+
+
+// // Función para sumarle stock a los productos que se encuentran en la lista
+// function añadirProductosAlStock () {
+//     let nombreDeProductoAAñadir = prompt ("Ingrese el nombre del producto al que desea añadirle unidaders existentes");
+//     let productoASumar = productos.find(producto => producto.verdura.toLowerCase() === nombreDeProductoAAñadir.toLowerCase());
+
+//     // Mientras no se encuentre el producto, solicitar nuevamente el input
+//     while (!productoASumar) {
+//         alert("Este producto no se encuentra disponible. Intente de nuevo.");
+//         nombreDeProductoAAñadir = prompt("Ingrese el nombre del producto al que desea añadirle unidades existentes");
+//         productoASumar = productos.find(producto => producto.verdura.toLowerCase() === nombreDeProductoAAñadir.toLowerCase());
+//     }
+
+//     let cantidadDeProductosAAñadir = parseInt(prompt("Ingrese la cantidad de unidades que desea añadir al stock actual"));
+//     if (!isNaN(cantidadDeProductosAAñadir)) {
+//         productoASumar.stock += cantidadDeProductosAAñadir;
+//         alert(`Se añadieron ${cantidadDeProductosAAñadir} unidades al stock de ${productoASumar.verdura}. Stock actual: ${productoASumar.stock}`);
+//     } else {
+//         while (isNaN(cantidadDeProductosAAñadir) || cantidadDeProductosAAñadir < 0) {
+//             alert("Cantidad inválida.");
+//             cantidadDeProductosAAñadir = parseInt(prompt("Ingrese la cantidad de unidades que desea añadir al stock actual"));
+//         }
+//     }
+// }
+
+
+
+// /*
+// * INICIO DEL PROGRAMA
+// */
+
+// alert("Bienvenido a la verdulería Las Divinas. Por favor, seleccione una de las siguientes acciones:");
+// let accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+
+// while (accion != 0) {
+//     switch (accion) {
+//         case 1:
+//             alert("Nuestro catálogo incluye los siguientes productos actualmente:");
+//             productos.forEach(element => {
+//                 alert(element.verdura + ", a $" + element.precio + ". Existencias actuales: " + element.stock + " unidades.");
+//             });
+//             console.log(productos);
+//             accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+//             break;
+//         case 2: 
+//             let productoAComprar = prompt("Ingrese el producto que desea comprar.");
+
+//             // Buscar el producto en el catálogo
+//             let productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === productoAComprar.toLowerCase());
+            
+//             // Verificar si el producto está en la lista
+//             while (!productoEncontrado) {
+//                 productoAComprar = prompt("El producto ingresado no corresponde a ninguno en la lista. Ingrese un producto válido para continuar.");
+//                 productoEncontrado = productos.find(producto => producto.verdura.toLowerCase() === productoAComprar.toLowerCase());
+//             }
+            
+//             let cantidadAComprar = parseInt(prompt("Ingrese la cantidad que desea comprar del producto. Si desea volver al menú anterior, ingrese 0."));
+//             while (cantidadAComprar < 0 || isNaN(cantidadAComprar)) {
+//                 alert("El valor ingresado no es válido para efectuar la compra. Porfavor, ingrese un valor válido");
+//                 cantidadAComprar = parseInt(prompt("Ingrese la cantidad que desea comprar del producto. Si desea volver al menú anterior, ingrese 0."));
+//             }
+            
+//             if (cantidadAComprar === 0) break;
+            
+//             let resultadoCompra = comprar(productoAComprar, cantidadAComprar);
+//             alert(resultadoCompra);
+//             accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+//             break;
+//         case 3:
+//             añadirProductosAlStock ();
+//             console.log(productos);
+//             accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+//             break;
+//         case 4:
+//             añadirProdctoPorPrompt();
+//             console.log(productos);
+//             accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+//             break;
+//         default: 
+//             alert("El valor ingresado no corresponde a ninguna acción, por favor ingrese un valor nuevo");
+//             accion = parseInt(prompt("1- Ver catálogo de productos. 2- Comprar un producto. 3- Añadir productos al stock. 4- Añadir un nuevo producto a la lista 0- Salir"));
+//     }
+// }
+
+
+//! ////////////////////
 
 
 

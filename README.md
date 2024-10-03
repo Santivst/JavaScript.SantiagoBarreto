@@ -1,14 +1,15 @@
 <h1 align="center">Hola! 👋, soy Santiago Barreto</h1>
-<h3 align="center">Buenas tarde, profe. Ésta sería mi segunda preentrega, se trata de un simulador de una verdulería. Me vino la idea un día que fui al almacén y ví al hombre que me atendió usando un programa para procesar las compras y pensé que podría hacer algo similar. Obviamente no es tan complejo pero es un prototipo entretenido, y creo que cumple con las necesidades de la entrega. Si me faltó algo comuníquemelo y así lo arreglo para la siguiente!</h3>
+<h3 align="center">Buenas tarde, profe. Ésta sería mi tercer preentrega. Se trata de un juego de tres en raya de dos jugadores. No tiene mucho misterio pero me pareció un proyecto entretenido :)</h3>
 
 
 <p align="left"><strong>Algunas cosas que creí necesarias aclarar:</strong></p>
 <br>
 <p align="left">En el archivo están todos los ejercicios que han ido mandando, hechos hasta las funciones. No creo que sea problemapero si para las entregas prefieren que saque los ejercicios y deje solo lo pertinente a la entrega en sí lo hago, y pongo los ejercicios en otro archivo</p>
-<p align="left">Los ejercicios están comentados, y notará que al inicio de algunas líneas de comentario hay símbolos, ésto es porque el profe de desarrollo web nos recomendó la extensión del better comments y uso eso para organizarme.</p>
-<p align="left">Los precios puestos son completamente inventados ya que no me conzco el precio de una unidad de ninguna verdura, ni siquiera en mi moneda que es el peso uruguayo jaja. Iba a hacer que fuera en kilogramos pero luego pensé que si el usuario quisiera añadir más objetos a la lista entonces sería mejor usar unidades.</p>
-<p align="left">La idea del programa sería usarlo en órden porque una vez se inician las opciones 2, 3 o 4 no hay forma de cancelarlas por el momento, así que cuidado con eso ajasj. Para poder circunnavegar eso basta con saber el nombre de alguno de los productos, por eso yo siempre usé papa para probar el funcionamiento</p>
-<p align="left">Para la próxima me gustaría añadirle un usuario con su propio balance, nombre y funciones así, pero sepa disculpar que no lo haya hecho para esta versión, es que han sido días complicados y decidí hacer lo minimo para que la entrega sea satisfactoria.</p>
+<p align="left">Los ejercicios están comentados, y notará que al inicio de algunas líneas de comentario hay símbolos, ésto es porque el profe de desarrollo web nos recomendó la extensión del better comments y uso eso para organizarme</p>
+<p align="left">Notará que usé SASS para manejar toda la parte de CSS. Espero no sea un inconveniente, porque en el curso anterior de desarrollo web lo usamos y no quiero olvidarme de cómo es, por lo que instalé node y lo implementé en el proyecto, aunque la carpeta que tengo entendido que hay que ignorar la ignoré en el .gitignore, así que no debería generar molestias</p>
+<p align="left">Respecto al juego en sí, las cosas que tienen que funcionar creo que van todas, aunque hay un detalle con el botón que reinicia el marcador y es que lo hace, pero para que se note hay que refrescar la página. Intenté arreglarlo de varias formas pero cuando tocaba algo ahí se rompía lo demás así que me decanté por dejarlo quieto ajaj</p>
+<p align="left">Para la parte de storage guardé unos datos simples como las victorias y otros más complejos como el estado del tablero, espero sea aceptable con eso</p>
+<p align="left">Añadí bastantes comentarios porque quería que se hiciera dinámica la lectura del código, y hasta a mi se me complicaba leerlo sin referencias, por lo que los puse para que no fuera tan jodido de corregir</p>
 <br>
 <br>
 <p align="left"><strong>Bueno profe, eso sería todo. Espero le guste la entrega!</strong></p>

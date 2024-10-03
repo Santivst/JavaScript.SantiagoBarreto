@@ -1,0 +1,92 @@
+// GRID PÁGINA
+
+body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto auto;
+    grid-template-areas: 
+        "headerr headerr headerr"
+        "mainn mainn asidee"
+        "footerr footerr footerr"
+    ;
+    width: 100%;
+
+    header {
+        grid-area: headerr;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        margin: 0 0 30px;
+    }
+
+    main {
+        width: 100%;
+        grid-area: mainn;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 0 0 0 30px;
+        button {
+            margin: 40px 0 0 0;
+            width: 20%;
+            border-radius: 15px;
+        }
+    }
+
+    aside {
+        grid-area: asidee;
+        width: 100%;
+        .victoriasAzul {
+            color: blue;
+        }
+        .victoriasRojo {
+            color: red;
+        }
+    }
+
+    footer {
+        grid-area: footerr;
+        width: 100%;
+        margin: 40px 0 0 0;
+    }
+}
+
+// GRID JUEGO
+
+@for $i from 1 through 9 {
+    .grid__celda-#{$i} {
+        grid-area: celda#{$i};
+        gap: 10px;
+        border-style: solid;
+        border-width: 3px;
+        border-color: black;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+#juego__grid-principal {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-areas: 
+        "celda1 celda2 celda3"
+        "celda4 celda5 celda6"
+        "celda7 celda8 celda9"
+    ;
+    width: 80%;
+    height: 500px;
+}
+
+.celda-azul {
+    background-color: blue;
+}
+
+.celda-rojo {
+    background-color: red;
+}
+
+.celda-vacia {
+    background-color: white;
+}

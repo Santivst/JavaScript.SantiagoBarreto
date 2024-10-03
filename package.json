@@ -1,0 +1,18 @@
+{
+  "name": "javascript.-santiagobarreto",
+  "version": "1.0.0",
+  "description": "<h1 align=\"center\">Hola! 👋, soy Santiago Barreto</h1>\r <h3 align=\"center\">Buenas tarde, profe. Ésta sería mi segunda preentrega, se trata de un simulador de una verdulería. Me vino la idea un día que fui al almacén y ví al hombre que me atendió usando un programa para procesar las compras y pensé que podría hacer algo similar. Obviamente no es tan complejo pero es un prototipo entretenido, y creo que cumple con las necesidades de la entrega. Si me faltó algo comuníquemelo y así lo arreglo para la siguiente!</h3>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-css": "node-sass --include-path scss scss/estilos.scss css/estilos.css",
+    "watch-css": "nodemon -e scss -x \"npm run build-css\""
+
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "node-sass": "^9.0.0",
+    "nodemon": "^3.1.7"
+  }
+}

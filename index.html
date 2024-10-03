@@ -3,11 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Proyecto JavaScript SantiagoBarreto</title>
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-    <h1>Un título adecuado</h1>
-
+    <header>
+        <nav>
+            <h1>Tres en raya, THE GAME.</h1>
+            <p id="parrafoIndicativohtml">Juego en proceso...</p>
+        </nav>
+    </header>
+    <main>
+        <div id="juego__grid-principal"></div>
+        <button type="button" id="botonReiniciarPartida"> REINICIAR TABLERO </button>
+        <button type="button" id="botonReiniciarJuegoEntero"> REINICIAR MARCADOR </button>
+    </main>
+    <aside>
+        <p class="victoriasAzul">VICTORIAS DE AZUL: <span><strong id="victoriasAzul"></strong></span></p>
+        <p  class="victoriasRojo">VICTORIAS DE ROJO: <span><strong id="victoriasRojo"></strong></span></p>
+    </aside>
+    <footer>
+        <div>
+            <h2>REGLAS:</h2>
+            <div>
+                <p><strong>SI EL CUADRADO ESTÁ EN BLANCO: </strong>puede ser reclamado por el siguiente jugador</p>
+                <p><strong>SI EL CUADRADO ESTÁ AZUL: </strong>el cuadrado ha sido reclamado por el primer jugador</p>
+                <p><strong>SI EL CUADRADO ESTÁ ROJO: </strong>el cuadrado ha sido reclamado por el segundo jugador</p>
+                <p><strong>SI TRES CUADRADOS CONSECUTIVOS, SEA EN HORIZONTAL, VERTICAL O DIAGONAL, ACABAN SIENDO AZULES O ROJOS: </strong>el jugador que lo haya logrado gana automáticamente el juego, y la partida puede ser reiniciada</p>
+            </div>
+        </div>
+    </footer>
     <script src="./js/main.js"></script>
 </body>
 </html>
