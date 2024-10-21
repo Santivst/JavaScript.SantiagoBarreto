@@ -1,281 +1,355 @@
-//! TERCER PREENTREGA, JUEGO DE TRES EN RAYA CON LOCALSTORAGE Y JSON
+//! ENTREGA FINAL, POKÉDEX DE QUINTA GENERACIÓN
 
-/*
-* OBJETOS
-*/
 
-class Celda {
-    constructor(id) {
-        this.id = id;
-    }
-    generarhtml() {
-        const num = this.id.replace('celda', '');
-        const divCelda = document.createElement("div");
-        divCelda.className = `celda grid__celda-${num} celda-vacia`;
-        return divCelda;
-    }
+//* Crea las variables correspondientes a la pokédex en sí para después renderizarlas.
+const listaPokemon = document.querySelector("#listaPokemon");
+const botonesHeader = document.querySelectorAll(".btn-header");
+let URL = "https://pokeapi.co/api/v2/pokemon/";
+
+
+//* Renderiza cada pokémon de la PokeAPI de la quinta generación (Del pokémon #494 al #649).
+for (let i = 494; i <= 649; i++) {
+    fetch(URL + i)
+        .then((response) => response.json())
+        // Utiliza una función para mostrar los pokémon cargados en el HTML. //? Función declarada en la línea 20.
+        .then(data =>  mostrarPokemon(data))
 }
 
+
+//* Crea el HTML de cada pokémon para después renderizarlos.
+function mostrarPokemon(poke) {
+    // Asigna el valor a la variante tipos, correspondiente al tipo/s de cada pokémon.
+    let tipos = poke.types.map(type => `<p class="${type.type.name} tipo">${type.type.name}</p>`
+    );
+    tipos = tipos.join('');
+
+    // Crea la variable div con el elemento HTML "div"y le añade la clase "pokemon". 
+    const div = document.createElement("div");
+    div.classList.add("pokemon");
+
+    // Le asigna a la variable 'div' el contenido HTML que le corresponde y lo une a la variable que contendrá el contenido.
+    div.innerHTML = `
+    <p class="pokemon-id-back">#${poke.id}</p>
+    <div class="pokemon-imagen">
+        <img src="${poke.sprites.other["official-artwork"].front_default}" alt="${poke.name}">
+    </div>
+    <div class="pokemon-info">
+        <div class="nombre-contenedor">
+            <p class="pokemon-id">#${poke.id}</p>
+            <h2 class="pokemon-nombre">${poke.name}</h2>
+        </div>
+        <div class="pokemon-tipos">
+            ${tipos}
+        </div>
+        <div class="pokemon-stats">
+            <p class="stat">${poke.height}m</p>
+            <p class="stat">${poke.weight}kg</p>
+        </div>
+    </div>
+    `;
+    listaPokemon.append(div);
+}
+
+
+//* A los botones de filtrado del "nav" les asigna un evento.
+botonesHeader.forEach(boton => boton.addEventListener("click", (event) => {
+    const botonId = event.currentTarget.id;
+    // Le elimina clase a la avariable correspondiente a la grilla donde se renderizan los equipos. //? Variable declarada en la línea 94.
+    divContenedorGrillaEqipo.classList.remove("contenedor-grilla-eqipo");
+
+    // Limpia el HTML
+    listaPokemon.innerHTML = '';
+    limpiarDivEquipo.innerHTML = '';
+
+    // Recorre todos los pokémon de la pokédex.
+    for (let i = 494; i <= 649; i++) {
+        fetch(URL + i)
+            .then((response) => response.json())
+            .then(data => {
+                //  Si el ID del botón actual tiene el ID "ver-todos", renderiza toda la pokédex. De lo contrario, renderiza los que tienen el tipo seleccionado.
+                if(botonId === "ver-todos") {
+                    // Utiliza una función para mostrar los pokémon cargados en el HTML. //? Función declarada en la línea 20.
+                    mostrarPokemon(data);
+                } else {
+                    let tipos = data.types.map(type => type.type.name);
+                    if (tipos.some(tipo => tipo.includes(botonId))){
+                        // Utiliza una función para mostrar los pokémon cargados en el HTML. //? Función declarada en la línea 20.
+                        mostrarPokemon(data);
+                    }
+                }
+            })
+    }
+}))
+
+
+
+
 /*
-* FUNCIONES
+* FUNCIONES DEL BOTÓN PARA CREAR EQUIPOS
 */
 
-//* Fucnión que renderiza el tablero
-function renderizarJuego() {
-    // Limpiar el HTML
-    divGrilla.innerHTML = "";
-    // Generar de forma dinámica cada celda de la matriz con su id respectivo
-    for (let i = 0; i < celdas.length; i++) {
-        for (let j = 0; j < celdas[i].length; j++) {
-            const idCelda = celdas[i][j];
-            const celda = new Celda(idCelda);
-            const elementoCelda = celda.generarhtml();
+//* Crea todas las variables usadas en la funcionalidad correspondiente al botón "Crear equipo".
+const botonCrearEquipo = document.getElementById("btn-crear-equipo");
+const limpiarDivEquipo = document.getElementById("contenedor-grilla-eqipo");
+const divContenedorGrillaEqipo = document.getElementById("contenedor-grilla-eqipo");
 
-            // Restaurar el estado visual del tablero desde LocalStorage
-            if (estadoTablero[i][j] === 'azul') {
-                elementoCelda.classList.remove('celda-vacia');
-                elementoCelda.classList.add('celda-azul');
-            } else if (estadoTablero[i][j] === 'rojo') {
-                elementoCelda.classList.remove('celda-vacia');
-                elementoCelda.classList.add('celda-rojo');
+
+//* Le añade evento al botón de crear equipo, para así limpiar el HTML y renderizar la grilla.
+botonCrearEquipo.addEventListener("click", () => {
+    // Limpia el HTML.
+    listaPokemon.innerHTML = '';
+    limpiarDivEquipo.innerHTML = '';
+    // Le añade una clase pertinente al contenedor de la grilla.
+    divContenedorGrillaEqipo.classList.add("contenedor-grilla-eqipo");
+
+    // Crea las dos filas internas de la grilla. //! Hubo un error al nombrarlas, y en lugar de "filas" se llaman "columnas".
+    const divCrearEquipoColumna1 = document.createElement("div");
+    divCrearEquipoColumna1.classList.add("grilla-equipo-columna-1");
+
+    const divCrearEquipoColumna2 = document.createElement("div");
+    divCrearEquipoColumna2.classList.add("grilla-equipo-columna-2");
+
+    // Inserta las filas correspondientes a la grilla al HTML.
+    limpiarDivEquipo.append(divCrearEquipoColumna1);
+    limpiarDivEquipo.append(divCrearEquipoColumna2);
+
+    /*
+    Le coloca a las celdas un input y botón de forma tal que al escribir el nombre o ID 
+    correspondiente a un pokémon cualquiera lo renderiza en el HTML dentro de la celda.
+    ? Función declarada en la fila 202.
+    */
+    crearCeldasEquipo(divCrearEquipoColumna1, divCrearEquipoColumna2);
+
+    // Crea el botón para reiniciar el equipo, incluído el local storage.
+    const botonReiniciarEquipo = document.createElement("button");
+    botonReiniciarEquipo.classList.add("btn-reiniciar-equipo")
+    botonReiniciarEquipo.innerText = "Reiniciar equipo";
+
+    // Si hay un array con los pokémon seleccionados guardados en el local storage, los carga en el HTML. //? Función declarada en la fila 316.
+    cargarEquipoDesdeStorage();
+
+    // Coloca el botón para reiniciar el local storage en el HTML y le añade un evento.
+    limpiarDivEquipo.append(botonReiniciarEquipo);
+    botonReiniciarEquipo.addEventListener("click", () => {
+        // Pregunta si está seguro de eliminar el equipo guardado con Sweet Alerts
+        Swal.fire({
+            title: '¿Está seguro que desea eliminar este equipo?',
+            text: 'Seleccione una opción para continuar',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si, estoy seguro',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el resultado es afirmativo, limpia el HTML de la grilla.
+                divCrearEquipoColumna1.innerHTML = '';
+                divCrearEquipoColumna2.innerHTML = '';
+
+                // Limpia el localStorage.
+                localStorage.removeItem("equipoPokemon");
+                
+                // Y vuelve a crear la grilla que almacenará el nuevo equipo. //? Función declarada en la línea 203
+                crearCeldasEquipo(divCrearEquipoColumna1, divCrearEquipoColumna2);
+                
+                // Finalmente, vuelve a colocar el botón de reiniciar en su lugar.
+                limpiarDivEquipo.append(botonReiniciarEquipo);
             }
+        })
+    })
 
-            elementoCelda.addEventListener('click', () => manejarClic(i, j, elementoCelda));
-            divGrilla.append(elementoCelda);
-        }
-    }
-    juegoActivo = true;
-}
+    // Crea el botón para guardar el equipo actual en el local storage, le añade una clase pertinente y lo une al HTML.
+    const botonGuardarEquipo = document.createElement("button");
+    botonGuardarEquipo.classList.add("btn-reiniciar-equipo");
+    botonGuardarEquipo.innerText = "Guardar equipo";
 
+    limpiarDivEquipo.append(botonGuardarEquipo);
 
-
-//* Fucnión que controla las interacciones con el tablero
-function manejarClic(i, j, elementoCelda) {
-    if (!juegoActivo || estadoTablero[i][j] !== null) {
-        return;
-    }
-
-    estadoTablero[i][j] = jugadorActual;
-    elementoCelda.classList.remove('celda-vacia');
-    elementoCelda.classList.add(`celda-${jugadorActual}`);
-
-    // Guardar el estado del juego en LocalStorage. Función declarada en la línea 160
-    guardarEstadoJuego();
-
-    // Verifica quién ganó la partida. //? Función declarada en la línea 68
-    verificarGanador();
-
-    jugadorActual = jugadorActual === 'azul' ? 'rojo' : 'azul';
-    localStorage.setItem('jugadorActual', JSON.stringify(jugadorActual));
-}
-
-
-
-//* Fucnión que verifica quién ganó la partida actual
-function verificarGanador() {
-    const combinacionesGanadoras = [
-        // Filas
-        [[0, 0], [0, 1], [0, 2]],
-        [[1, 0], [1, 1], [1, 2]],
-        [[2, 0], [2, 1], [2, 2]],
-        // Columnas
-        [[0, 0], [1, 0], [2, 0]],
-        [[0, 1], [1, 1], [2, 1]],
-        [[0, 2], [1, 2], [2, 2]],
-        // Diagonales
-        [[0, 0], [1, 1], [2, 2]],
-        [[0, 2], [1, 1], [2, 0]],
-    ];
-
-    for (const combinacion of combinacionesGanadoras) {
-        const [a, b, c] = combinacion;
-        const valorA = estadoTablero[a[0]][a[1]];
-        const valorB = estadoTablero[b[0]][b[1]];
-        const valorC = estadoTablero[c[0]][c[1]];
+    // Le añade un evento al botón de guardar equipo.
+    botonGuardarEquipo.addEventListener("click", () => {
         
-        // Si hay tres celdas consecutivas con el mismo valor, gana el jugador correspondiente
-        if (valorA && valorA === valorB && valorA === valorC) {
-            parrafoIndicativo.innerHTML = `El ganador es el jugador ${jugadorActual}!`;
-
-            // Se suma la victoria de cada jugador a LocalStorage
-            if (jugadorActual === 'azul') {
-                parrafoIndicativo.style.color = "blue";
-                victoriasAzules++;
-                localStorage.setItem('victoriasAzules', JSON.stringify(victoriasAzules));
-            } else if (jugadorActual === 'rojo') {
-                parrafoIndicativo.style.color = "red";
-                victoriasRojas++;
-                localStorage.setItem('victoriasRojas', JSON.stringify(victoriasRojas));
-            }
-            
-            // Actualizar contador de victorias
-            vecesQueGanoAzul = document.getElementById("victoriasAzul");
-            vecesQueGanoAzul.innerHTML = localStorage.getItem('victoriasAzules');
-
-            vecesQueGanoRojo = document.getElementById("victoriasRojo");
-            vecesQueGanoRojo.innerHTML = localStorage.getItem('victoriasRojas');
-
-            //Evita que se siga interactuando con el tablero. //? Función declarada en la línea 126
-            deshabilitarJuego();
-            return;
+    // Crea el array que contendrá el equipo creado.
+    let equipo = [];
+    
+    // Recorrer los slots para obtener los Pokémon seleccionados.
+    const slots = document.querySelectorAll('.pokemon');
+    slots.forEach(slot => {
+        const pokemonNombre = slot.querySelector('.pokemon-nombre')?.innerText;
+        if (pokemonNombre) {
+            equipo.push(pokemonNombre);
         }
-    }
-
-    // Verificar empate. Genera un array unidimensional con el valor de todas las "coordenadas" de la variable "estadoTablero", 
-    // y, en caso de ser todas "null", declara un empate
-    const hayEmpate = estadoTablero.flat().every(celda => celda !== null);
-    if (hayEmpate) {
-        parrafoIndicativo.innerHTML = `Es un empate!`;
-        parrafoIndicativo.style.color = "green"
-
-        //Evita que se siga interactuando con el tablero. //? Función declarada en la línea 126
-        deshabilitarJuego();
-    }
-}
-
-
-
-//* Función que evita que se siga interactuando con el tablero
-function deshabilitarJuego() {
-    juegoActivo = false;
-    // Selecciona todas las entidades con la clase "celda" generadas en el HTML y les elimina dicha clase
-    // para que no se pueda seguir interactuando con ellas con la función "manejarClic"
-    const celdasDOM = document.querySelectorAll('.celda');
-    celdasDOM.forEach(celda => {
-        celda.removeEventListener('click', manejarClic);
-        celda.classList.add('deshabilitada');
     });
-}
 
+    // Guardar el equipo en localStorage, con un mensaje que indica que se logró satisfactoriamente.
+    localStorage.setItem("equipoPokemon", JSON.stringify(equipo));
+    Swal.fire({
+        title: '¡Equipo guardado!',
+        icon: 'sucess',
+        confirmButtonText: 'Genial!'
+    });
+    })
+});
 
-
-//* Función que permite al botón de "REINICIAR TABLERO" y "REINICIAR MARCADOR" funcionar correctamente
-function reiniciarJuego() {
-    // Le asigna el valor de "null" a todas las coordenadas de la matriz del tablero
-    for (let i = 0; i < estadoTablero.length; i++) {
-        for (let j = 0; j < estadoTablero[i].length; j++) {
-            estadoTablero[i][j] = null;
-        }
-    }
-
-    jugadorActual = 'azul';
-    parrafoIndicativo.innerHTML = `Juego en proceso...`;
-    parrafoIndicativo.style.color = "black";
-
-    // Eliminar el estado guardado en LocalStorage
-    localStorage.removeItem('estadoTablero');
-    localStorage.removeItem('jugadorActual');
-
-    // Función que limpia el tablero. //? Declarada en la línea 24
-    renderizarJuego();
-}
-
-
-
-//* Función para reiniciar el marcador
-//! Para que se vean los efectos de esta función al apretar el botón "REINICIAR MARCADOR" hay que refrescar la página
-function reiniciarMarcador() {
-    // Vuelve al juego a su estado inicial. //? Función declarada en la línea 154
-    reiniciarJuego();
-    // Limpia el contador de victorias del LocalStorage
-    localStorage.removeItem('victoriasAzules');
-    localStorage.removeItem('victoriasRojas');
-}
-
-
-
-//* Función que perimite que la partida actual se guarde a pesar de refrescar la página
-function guardarEstadoJuego() {
-    localStorage.setItem('estadoTablero', JSON.stringify(estadoTablero));
-}
-
-
-
-//* Función que recupera el estado de la partida tras haber sido refrescada la página
-function recuperarEstadoJuego() {
-    let estadoGuardado = JSON.parse(localStorage.getItem('estadoTablero'));
-    let jugadorGuardado = JSON.parse(localStorage.getItem('jugadorActual'));
-
-    if (estadoGuardado) {
-        estadoTablero = estadoGuardado;
-        jugadorActual = jugadorGuardado || 'azul';
-        parrafoIndicativo.innerHTML = `Es el turno de ${jugadorActual}`;
-    } else {
-        jugadorActual = 'azul'; // Azul empieza si no hay datos guardados
-    }
-}
-
-
-
-//* Variables que almacenan las victorias de cada uno de los jugadores
-let vecesQueGanoAzul = document.getElementById("victoriasAzul");
-vecesQueGanoAzul.innerHTML = localStorage.getItem('victoriasAzules');
-
-let vecesQueGanoRojo = document.getElementById("victoriasRojo");
-vecesQueGanoRojo.innerHTML = localStorage.getItem('victoriasRojas');
 
 
 
 
 /*
-* INICIO DEL PROGRAMA
-*/
-
-const divGrilla = document.getElementById("juego__grid-principal");
-const parrafoIndicativo = document.getElementById("parrafoIndicativohtml");
-
-// Inicializar las victorias desde LocalStorage o en 0 si no existen
-let victoriasAzules = JSON.parse(localStorage.getItem('victoriasAzules')) || 0;
-let victoriasRojas = JSON.parse(localStorage.getItem('victoriasRojas')) || 0;
-
-let jugadorActual = 'azul'; // 'azul' comienza primero
-let juegoActivo = true; // Control del estado del juego
-
-let estadoTablero = [
-    [null, null, null],
-    [null, null, null],
-    [null, null, null],
-];
-
-const celdas = [
-    ["celda1", "celda2", "celda3"],
-    ["celda4", "celda5", "celda6"],
-    ["celda7", "celda8", "celda9"],
-];
+* FUNCIONONES
+*/ 
 
 
+//* Función usada para crear y renderizar la grilla por la cual se crean los equipos
+
+function crearCeldasEquipo(divCrearEquipoColumna1, divCrearEquipoColumna2) {
+    // Recorre y crea cada celda de la primer fila en la que se almacenan los pokemon del equipo, añadiendo clases pertinentes.
+    for (let i = 1; i <= 3; i++) {
+        const divSlot = document.createElement("div");
+        divSlot.classList.add(`grilla-equipo-${i}`);
+        divSlot.classList.add(`pokemon`);
+
+        // Crea el botón y el input por el cual luego se pondrán los pokémon del equipo.
+        const input = document.createElement("input");
+        input.setAttribute("type", "text");
+        input.setAttribute("placeholder", `Pokémon ${i}`);
+
+        const buttonSubmit = document.createElement("button");
+        buttonSubmit.innerText = "Submit";
+        
+        // Le añade un evento botón para que, al enviar nombre o ID, reemplace el contenido del contenedor con el Pokémon correspondiente.
+        buttonSubmit.addEventListener("click", () => {
+            const pokemonName = input.value.toLowerCase(); // Obtener nombre.
+            if (pokemonName) {
+                fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                    // Muestra el Pokémon en el slot correspondiente. //? Función declarada en la línea 291.
+                        mostrarPokemonEquipo(data, divSlot);
+                    })
+                    .catch(error => {
+                        // En caso de error, muestra un Sweet Alert que lo indica.
+                        Swal.fire({
+                            title: '¡Algo salió mal!',
+                            text: 'El pokémon ingresado no existe',
+                            icon: 'error',
+                            confirmButtonText: 'Entendido'
+                        });
+                    });
+            }
+        });
+        // Añadir input y botón a la celda
+        divSlot.append(input, buttonSubmit);
+
+        // Añadir cada celda a la grilla
+        divCrearEquipoColumna1.append(divSlot);
+    }
+    // Recorre y crea cada celda de la segunda fila en la que se almacenan los pokemon del equipo, añadiendo clases pertinentes.
+    for (let i = 4; i <= 6; i++) {
+        const divSlot = document.createElement("div");
+        divSlot.classList.add(`grilla-equipo-${i}`);
+        divSlot.classList.add(`pokemon`);
+
+        // Crea el botón y el input por el cual luego se pondrán los pokémon del equipo.
+        const input = document.createElement("input");
+        input.setAttribute("type", "text");
+        input.setAttribute("placeholder", `Pokémon ${i}`);
+
+        const buttonSubmit = document.createElement("button");
+        buttonSubmit.innerText = "Submit";
+        
+        // Le añade un evento botón para que, al enviar nombre o ID, reemplace el contenido del contenedor con el Pokémon correspondiente.
+        buttonSubmit.addEventListener("click", () => {
+            const pokemonName = input.value.toLowerCase(); // Obtener nombre
+            if (pokemonName) {
+                fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                    // Muestra el Pokémon en el slot correspondiente. //? Función declarada en la línea 291.
+                        mostrarPokemonEquipo(data, divSlot);
+                    })
+                    .catch(error => {
+                        // En caso de error, muestra un Sweet Alert que lo indica.
+                        Swal.fire({
+                            title: '¡Algo salió mal!',
+                            text: 'El pokémon ingresado no existe',
+                            icon: 'error',
+                            confirmButtonText: 'Entendido'
+                        });
+                    });
+            }
+        });
+        // Añadir input y botón a la celda
+        divSlot.append(input, buttonSubmit);
+
+        // Añadir cada celda a la grilla
+        divCrearEquipoColumna2.append(divSlot);
+    }
+}
 
 
-// Botón para reiniciar el tablero
-const botonReiniciar = document.getElementById("botonReiniciarPartida");
-botonReiniciar.addEventListener("click", reiniciarJuego);
+//* Función usada para mostrar los pokémon al usar la grilla de "Crear equipo"
 
-// Botón para reiniciar el juego
-const botonReiniciarMarcador = document.getElementById("botonReiniciarJuegoEntero");
-botonReiniciarMarcador.addEventListener("click", reiniciarMarcador);
-
-
-
-
-// Recuperar estado del juego y renderizar
-recuperarEstadoJuego();
-renderizarJuego();
-
-
-
-
-//! ////////////////////
-
-
-
-
-/*
-! COPIA DE SEGURIDAD: PREVIO A LOCAL STORAGE Y JSON
-*/
+function mostrarPokemonEquipo(poke, divSlot) {
+    divSlot.innerHTML = `
+        <p class="pokemon-id-back">#${poke.id}</p>
+        <div class="pokemon-imagen">
+            <img src="${poke.sprites.other["official-artwork"].front_default}" alt="${poke.name}">
+        </div>
+        <div class="pokemon-info">
+            <div class="nombre-contenedor">
+                <p class="pokemon-id">#${poke.id}</p>
+                <h2 class="pokemon-nombre">${poke.name}</h2>
+            </div>
+            <div class="pokemon-tipos">
+                ${poke.types.map(type => `<p class="${type.type.name} tipo">${type.type.name}</p>`).join('')}
+            </div>
+            <div class="pokemon-stats">
+                <p class="stat">${poke.height}m</p>
+                <p class="stat">${poke.weight}kg</p>
+            </div>
+        </div>
+    `;
+}
 
 
+//* Función usada para guardar el equipo en local storage 
 
-//! TERCER PREENTREGA, JUEGO DE TRES EN RAYA
+function cargarEquipoDesdeStorage() {
+    // Crea una variable que contiene los pokémon almacenados en local storage
+    const equipoGuardado = JSON.parse(localStorage.getItem("equipoPokemon"));
+    
+    // Si la variable existe y tiene al menos un (1) pokémon guardado, lo renderiza en la grilla.
+    if (equipoGuardado && equipoGuardado.length > 0) {
+        const slots = document.querySelectorAll('.pokemon');
+        
+        equipoGuardado.forEach((nombre, index) => {
+            if (slots[index]) {
+                fetch(`https://pokeapi.co/api/v2/pokemon/${nombre.toLowerCase()}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Muestra el Pokémon en el slot correspondiente. //? Función declarada en la línea 291
+                        mostrarPokemonEquipo(data, slots[index]);
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar el Pokémon:', error);
+                    });
+            }
+        });
+    }
+}
+
+// Llama a la función después de crear el equipo
+cargarEquipoDesdeStorage();
+
+
+
+
+
+
+
+
+
+
+//! TERCER PREENTREGA, JUEGO DE TRES EN RAYA CON LOCALSTORAGE Y JSON
 
 // /*
 // * OBJETOS
@@ -286,35 +360,37 @@ renderizarJuego();
 //         this.id = id;
 //     }
 //     generarhtml() {
-//         // Extraer el número de la celda desde el id, por ejemplo, 'celda1' -> '1'
 //         const num = this.id.replace('celda', '');
-//         // Crear un elemento div para la celda
 //         const divCelda = document.createElement("div");
 //         divCelda.className = `celda grid__celda-${num} celda-vacia`;
 //         return divCelda;
 //     }
 // }
 
-
-
-
-
 // /*
 // * FUNCIONES
 // */
 
-
+// //* Fucnión que renderiza el tablero
 // function renderizarJuego() {
+//     // Limpiar el HTML
 //     divGrilla.innerHTML = "";
-//     // Recorro las celdas
+//     // Generar de forma dinámica cada celda de la matriz con su id respectivo
 //     for (let i = 0; i < celdas.length; i++) {
 //         for (let j = 0; j < celdas[i].length; j++) {
-//             // Creo un objeto celda con el id de cada una de las recorridas
 //             const idCelda = celdas[i][j];
 //             const celda = new Celda(idCelda);
-//             // Genero el elemento celda en el HTML
 //             const elementoCelda = celda.generarhtml();
-//             // Le doy funcionalidad al clickear con una función declarada más adelante y la añado
+
+//             // Restaurar el estado visual del tablero desde LocalStorage
+//             if (estadoTablero[i][j] === 'azul') {
+//                 elementoCelda.classList.remove('celda-vacia');
+//                 elementoCelda.classList.add('celda-azul');
+//             } else if (estadoTablero[i][j] === 'rojo') {
+//                 elementoCelda.classList.remove('celda-vacia');
+//                 elementoCelda.classList.add('celda-rojo');
+//             }
+
 //             elementoCelda.addEventListener('click', () => manejarClic(i, j, elementoCelda));
 //             divGrilla.append(elementoCelda);
 //         }
@@ -322,42 +398,32 @@ renderizarJuego();
 //     juegoActivo = true;
 // }
 
-// let jugadorActual = 'azul'; // 'azul' comienza primero
-// let juegoActivo = true; // Agregada para controlar el estado del juego
 
-// // Actualiza la función manejarClic
+
+// //* Fucnión que controla las interacciones con el tablero
 // function manejarClic(i, j, elementoCelda) {
 //     if (!juegoActivo || estadoTablero[i][j] !== null) {
-//         // El juego no está activo o la celda ya está ocupada
 //         return;
 //     }
 
-//     // Actualizar el estado del tablero
 //     estadoTablero[i][j] = jugadorActual;
-
-//     // Actualizar la clase CSS correspondiente
 //     elementoCelda.classList.remove('celda-vacia');
 //     elementoCelda.classList.add(`celda-${jugadorActual}`);
 
-//     // Verificar si hay un ganador
+//     // Guardar el estado del juego en LocalStorage. Función declarada en la línea 160
+//     guardarEstadoJuego();
+
+//     // Verifica quién ganó la partida. //? Función declarada en la línea 68
 //     verificarGanador();
 
-//     // Alternar el jugador
 //     jugadorActual = jugadorActual === 'azul' ? 'rojo' : 'azul';
+//     localStorage.setItem('jugadorActual', JSON.stringify(jugadorActual));
 // }
 
-// // Actualiza la función deshabilitarJuego
-// function deshabilitarJuego() {
-//     juegoActivo = false; // Desactivar el juego
-//     const celdasDOM = document.querySelectorAll('.celda');
-//     celdasDOM.forEach(celda => {
-//         celda.removeEventListener('click', manejarClic); // Esto eliminará el listener del evento clic
-//         celda.classList.add('deshabilitada'); // Opcional: añade una clase para deshabilitar visualmente
-//     });
-// }
 
+
+// //* Fucnión que verifica quién ganó la partida actual
 // function verificarGanador() {
-//     // Definir las posibles combinaciones ganadoras
 //     const combinacionesGanadoras = [
 //         // Filas
 //         [[0, 0], [0, 1], [0, 2]],
@@ -377,53 +443,127 @@ renderizarJuego();
 //         const valorA = estadoTablero[a[0]][a[1]];
 //         const valorB = estadoTablero[b[0]][b[1]];
 //         const valorC = estadoTablero[c[0]][c[1]];
+        
+//         // Si hay tres celdas consecutivas con el mismo valor, gana el jugador correspondiente
 //         if (valorA && valorA === valorB && valorA === valorC) {
-//             // Mostrar mensaje de ganador en el párrafo
-//             parrafoIndicativo.innerHTML = `El ganador es el jugador ${jugadorActual}!`
-//             if (jugadorActual == "azul") {
+//             parrafoIndicativo.innerHTML = `El ganador es el jugador ${jugadorActual}!`;
+
+//             // Se suma la victoria de cada jugador a LocalStorage
+//             if (jugadorActual === 'azul') {
 //                 parrafoIndicativo.style.color = "blue";
-//             } else if (jugadorActual == "rojo") {
+//                 victoriasAzules++;
+//                 localStorage.setItem('victoriasAzules', JSON.stringify(victoriasAzules));
+//             } else if (jugadorActual === 'rojo') {
 //                 parrafoIndicativo.style.color = "red";
+//                 victoriasRojas++;
+//                 localStorage.setItem('victoriasRojas', JSON.stringify(victoriasRojas));
 //             }
-//             // Deshabilitar más clics o reiniciar el juego
+            
+//             // Actualizar contador de victorias
+//             vecesQueGanoAzul = document.getElementById("victoriasAzul");
+//             vecesQueGanoAzul.innerHTML = localStorage.getItem('victoriasAzules');
+
+//             vecesQueGanoRojo = document.getElementById("victoriasRojo");
+//             vecesQueGanoRojo.innerHTML = localStorage.getItem('victoriasRojas');
+
+//             //Evita que se siga interactuando con el tablero. //? Función declarada en la línea 126
 //             deshabilitarJuego();
 //             return;
 //         }
 //     }
 
-//     // Verificar empate
+//     // Verificar empate. Genera un array unidimensional con el valor de todas las "coordenadas" de la variable "estadoTablero", 
+//     // y, en caso de ser todas "null", declara un empate
 //     const hayEmpate = estadoTablero.flat().every(celda => celda !== null);
 //     if (hayEmpate) {
-//         alert("Es un empate!")
+//         parrafoIndicativo.innerHTML = `Es un empate!`;
+//         parrafoIndicativo.style.color = "green"
+
+//         //Evita que se siga interactuando con el tablero. //? Función declarada en la línea 126
 //         deshabilitarJuego();
 //     }
 // }
 
+
+
+// //* Función que evita que se siga interactuando con el tablero
+// function deshabilitarJuego() {
+//     juegoActivo = false;
+//     // Selecciona todas las entidades con la clase "celda" generadas en el HTML y les elimina dicha clase
+//     // para que no se pueda seguir interactuando con ellas con la función "manejarClic"
+//     const celdasDOM = document.querySelectorAll('.celda');
+//     celdasDOM.forEach(celda => {
+//         celda.removeEventListener('click', manejarClic);
+//         celda.classList.add('deshabilitada');
+//     });
+// }
+
+
+
+// //* Función que permite al botón de "REINICIAR TABLERO" y "REINICIAR MARCADOR" funcionar correctamente
 // function reiniciarJuego() {
-//     // Resetear el estado del tablero
+//     // Le asigna el valor de "null" a todas las coordenadas de la matriz del tablero
 //     for (let i = 0; i < estadoTablero.length; i++) {
 //         for (let j = 0; j < estadoTablero[i].length; j++) {
 //             estadoTablero[i][j] = null;
 //         }
 //     }
 
-//     // Resetear el jugador actual
 //     jugadorActual = 'azul';
-
-//     // Resetear el parrafo indicativo
 //     parrafoIndicativo.innerHTML = `Juego en proceso...`;
 //     parrafoIndicativo.style.color = "black";
 
-//     // Renderizar nuevamente el juego
+//     // Eliminar el estado guardado en LocalStorage
+//     localStorage.removeItem('estadoTablero');
+//     localStorage.removeItem('jugadorActual');
+
+//     // Función que limpia el tablero. //? Declarada en la línea 24
 //     renderizarJuego();
 // }
 
-// // Botón para reiniciar la partida actual
-// const botonReiniciar = document.getElementById("botonReiniciarPartida");
-// botonReiniciar.addEventListener("click", reiniciarJuego);
+
+
+// //* Función para reiniciar el marcador
+// //! Para que se vean los efectos de esta función al apretar el botón "REINICIAR MARCADOR" hay que refrescar la página
+// function reiniciarMarcador() {
+//     // Vuelve al juego a su estado inicial. //? Función declarada en la línea 154
+//     reiniciarJuego();
+//     // Limpia el contador de victorias del LocalStorage
+//     localStorage.removeItem('victoriasAzules');
+//     localStorage.removeItem('victoriasRojas');
+// }
 
 
 
+// //* Función que perimite que la partida actual se guarde a pesar de refrescar la página
+// function guardarEstadoJuego() {
+//     localStorage.setItem('estadoTablero', JSON.stringify(estadoTablero));
+// }
+
+
+
+// //* Función que recupera el estado de la partida tras haber sido refrescada la página
+// function recuperarEstadoJuego() {
+//     let estadoGuardado = JSON.parse(localStorage.getItem('estadoTablero'));
+//     let jugadorGuardado = JSON.parse(localStorage.getItem('jugadorActual'));
+
+//     if (estadoGuardado) {
+//         estadoTablero = estadoGuardado;
+//         jugadorActual = jugadorGuardado || 'azul';
+//         parrafoIndicativo.innerHTML = `Es el turno de ${jugadorActual}`;
+//     } else {
+//         jugadorActual = 'azul'; // Azul empieza si no hay datos guardados
+//     }
+// }
+
+
+
+// //* Variables que almacenan las victorias de cada uno de los jugadores
+// let vecesQueGanoAzul = document.getElementById("victoriasAzul");
+// vecesQueGanoAzul.innerHTML = localStorage.getItem('victoriasAzules');
+
+// let vecesQueGanoRojo = document.getElementById("victoriasRojo");
+// vecesQueGanoRojo.innerHTML = localStorage.getItem('victoriasRojas');
 
 
 
@@ -435,19 +575,18 @@ renderizarJuego();
 // const divGrilla = document.getElementById("juego__grid-principal");
 // const parrafoIndicativo = document.getElementById("parrafoIndicativohtml");
 
-// let victoriasRojas = [];
-// let victoriasAzules = [];
+// // Inicializar las victorias desde LocalStorage o en 0 si no existen
+// let victoriasAzules = JSON.parse(localStorage.getItem('victoriasAzules')) || 0;
+// let victoriasRojas = JSON.parse(localStorage.getItem('victoriasRojas')) || 0;
 
+// let jugadorActual = 'azul'; // 'azul' comienza primero
+// let juegoActivo = true; // Control del estado del juego
 
-// /*
-// * Estado del juego
-// */
-// const estadoTablero = [
+// let estadoTablero = [
 //     [null, null, null],
 //     [null, null, null],
 //     [null, null, null],
 // ];
-
 
 // const celdas = [
 //     ["celda1", "celda2", "celda3"],
@@ -457,14 +596,26 @@ renderizarJuego();
 
 
 
+
+// // Botón para reiniciar el tablero
+// const botonReiniciar = document.getElementById("botonReiniciarPartida");
+// botonReiniciar.addEventListener("click", reiniciarJuego);
+
+// // Botón para reiniciar el juego
+// const botonReiniciarMarcador = document.getElementById("botonReiniciarJuegoEntero");
+// botonReiniciarMarcador.addEventListener("click", reiniciarMarcador);
+
+
+
+
+// // Recuperar estado del juego y renderizar
+// recuperarEstadoJuego();
 // renderizarJuego();
 
 
 
+
 //! ////////////////////
-
-
-
 
 
 /*
@@ -515,7 +666,7 @@ renderizarJuego();
 
 
 
-
+//! ////////////////////
 
 
 //! SEGUNDA PREENTREGA, UNA VERDULERÍA

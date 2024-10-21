@@ -1,18 +1,19 @@
 <h1 align="center">Hola! 👋, soy Santiago Barreto</h1>
-<h3 align="center">Buenas tarde, profe. Ésta sería mi tercer preentrega. Se trata de un juego de tres en raya de dos jugadores. No tiene mucho misterio pero me pareció un proyecto entretenido :)</h3>
+<h3 align="center">Bueno, profe. Ésta sería mi última entrega. Se trata de una pokédex, con una función para crear tu propio equipo la cual conlleva la mayor parte del código. Espero la disfrute :)</h3>
 
 
 <p align="left"><strong>Algunas cosas que creí necesarias aclarar:</strong></p>
 <br>
-<p align="left">En el archivo están todos los ejercicios que han ido mandando, hechos hasta las funciones. No creo que sea problemapero si para las entregas prefieren que saque los ejercicios y deje solo lo pertinente a la entrega en sí lo hago, y pongo los ejercicios en otro archivo</p>
-<p align="left">Los ejercicios están comentados, y notará que al inicio de algunas líneas de comentario hay símbolos, ésto es porque el profe de desarrollo web nos recomendó la extensión del better comments y uso eso para organizarme</p>
+<p align="left">La pokédex en sí está más como referencia para usted, por si no conoce los pokémon para que no tenga que buscarlos al usar la función de crear equipo.</p>
+<p align="left">La pokédex en sí solo tiene pokémon de quinta generación, pero al momento de crear un equipo puede ingresar el nombre o ID de cualquier pokémon que se lo tomará como válido. Esto lo hice así para no limitarlo a una sola generación.</p>
 <p align="left">Notará que usé SASS para manejar toda la parte de CSS. Espero no sea un inconveniente, porque en el curso anterior de desarrollo web lo usamos y no quiero olvidarme de cómo es, por lo que instalé node y lo implementé en el proyecto, aunque la carpeta que tengo entendido que hay que ignorar la ignoré en el .gitignore, así que no debería generar molestias</p>
-<p align="left">Respecto al juego en sí, las cosas que tienen que funcionar creo que van todas, aunque hay un detalle con el botón que reinicia el marcador y es que lo hace, pero para que se note hay que refrescar la página. Intenté arreglarlo de varias formas pero cuando tocaba algo ahí se rompía lo demás así que me decanté por dejarlo quieto ajaj</p>
-<p align="left">Para la parte de storage guardé unos datos simples como las victorias y otros más complejos como el estado del tablero, espero sea aceptable con eso</p>
-<p align="left">Añadí bastantes comentarios porque quería que se hiciera dinámica la lectura del código, y hasta a mi se me complicaba leerlo sin referencias, por lo que los puse para que no fuera tan jodido de corregir</p>
+<p align="left">No utilicé directamente un "new Promise" o "setTimeOut" porque tengo entendido que todo ésto va 'implicito' en la asincronía de la API, al usar fetch, catch y así. Espero no haberme equivocado con eso. Igualente quería usarlo pero no tuve la creatividad suficiente para saber dónde asjasj</p>
+<p align="left">Añadí bastantes comentarios porque quería que se hiciera dinámica la lectura del código, y hasta a mi se me complicaba leerlo sin referencias, por lo que los puse para que no fuera tan jodido de corregir. Aclaro que tengo la extensión de "better comments", por eso uso símbolos raros</p>
+<p align="left">El archivo incluye todas mis preentregas y ejercicios que ha ido mandando para que hagamos, por si gusta revisar algo. Espero eso no moleste</p>
+<p align="left">Es la primera vez que uso JS, y fue jodido todo el curso, así que si hay algo para mejorar hágamelo saber, que recién siento que le agarro la mano :p</p>
 <br>
 <br>
-<p align="left"><strong>Bueno profe, eso sería todo. Espero le guste la entrega!</strong></p>
+<p align="left"><strong>Bueno profe, eso sería todo. Espero le guste la entrega como para considerarla óptima, que sino no entro en el top10 ni a palo ajaj. Que tenga buen día, fue un gusto compartir con usted. A ver si hace más apariciones como la de nerdearla :D</strong></p>
 <br>
 
 
